@@ -39,6 +39,8 @@ public abstract class ExSelecionavelController<T extends Selecionavel, DaoFiltro
 
 	public ExSelecionavelController(HttpServletRequest request, Result result, CpDao dao, SigaObjects so, EntityManager em) {
 		super(request, result, dao, so, em);
+		
+		ExController.incluirAtributosComuns(result);
 	}
 
 	protected ExDao dao() {
