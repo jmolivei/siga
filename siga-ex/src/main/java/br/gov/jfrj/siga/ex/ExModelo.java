@@ -101,6 +101,22 @@ public class ExModelo extends AbstractExModelo {
 	
 		return false;
 	}
+	
+	public boolean temMacroClassificacao() {
+		try {
+			if ("template/freemarker".equals(getConteudoTpBlob())
+					&& getConteudoBlobMod2() != null
+					&& (new String(getConteudoBlobMod2(), "utf-8"))
+							.contains("@classificacao"))
+				return true;
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return false;
+	}
+
 
 	public boolean isClassificacaoAutomatica() {
 		if(getExClassificacao() != null)

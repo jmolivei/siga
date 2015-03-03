@@ -3716,6 +3716,10 @@ public class ExBL extends CpBL {
 			if(doc.getDescrDocumento() == null || doc.getDescrDocumento().isEmpty())
 				throw new AplicacaoException(
 						"A descrição do documento não pode ser vazia.");
+			
+			if(doc.getExModelo().temMacroClassificacao()) {
+				String classific = processarComandosEmTag(doc, "classificacao");
+			}
 
 			long tempoIni = System.currentTimeMillis();
 
