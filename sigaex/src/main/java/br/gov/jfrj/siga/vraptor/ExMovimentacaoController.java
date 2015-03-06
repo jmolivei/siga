@@ -73,7 +73,7 @@ public class ExMovimentacaoController extends ExController {
 	}
 
 	private ExDocumento buscarDocumento(final BuscaDocumentoBuilder builder, final boolean verificarAcesso) {
-		ExDocumento doc = buscarDocumento(builder);
+		ExDocumento doc = builder.buscarDocumento(dao());
 
 		if (verificarAcesso && builder.getMob() != null)
 			verificaNivelAcesso(builder.getMob());
