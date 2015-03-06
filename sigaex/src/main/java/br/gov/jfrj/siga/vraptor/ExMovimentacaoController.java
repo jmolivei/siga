@@ -82,7 +82,7 @@ public class ExMovimentacaoController extends ExController {
 	}
 
 	@Get("app/expediente/mov/anexar")
-	public void anexa(final String sigla) {
+	public void anexa(final String sigla, final Long idMovPendencia) {
 		final BuscaDocumentoBuilder documentoBuilder = BuscaDocumentoBuilder.novaInstancia().setSigla(sigla);
 
 		buscarDocumento(documentoBuilder);
@@ -98,10 +98,18 @@ public class ExMovimentacaoController extends ExController {
 
 		final ExMobilVO mobilVO = new ExMobilVO(mob, getTitular(), getLotaTitular(), true, ExTipoMovimentacao.TIPO_MOVIMENTACAO_ANEXACAO, false);
 		final ExMobilVO mobilCompletoVO = new ExMobilVO(mob, getTitular(), getLotaTitular(), true, null, false);
+		
+		if(idMovPendencia != null) {
+			final ExMovimentacao movPendencia = dao.consultar(idMovPendencia, ExMovimentacao.class, false);
+			
+			if(movPendencia != null)
+				result.include("descrMov", movPendencia.getDescrMov());
+		}
 
 		result.include("mobilCompletoVO", mobilCompletoVO);
 		result.include("mobilVO", mobilVO);
 		result.include("sigla", sigla);
+		result.include("idMovPendencia", idMovPendencia);
 		result.include("mob", mob);
 		result.include("subscritorSel", movimentacaoBuilder.getSubscritorSel());
 		result.include("titularSel", movimentacaoBuilder.getTitularSel());

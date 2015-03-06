@@ -260,7 +260,7 @@
 						<c:forEach var="anexoPendente" items="${m.pendenciasDeAnexacao}">
 							<li>
 								<a
-								href="${pageContext.request.contextPath}/app/expediente/mov/anexar?sigla=${m.sigla}"
+								href="${pageContext.request.contextPath}/app/expediente/mov/anexar?sigla=${m.sigla}&idMovPendencia=${anexoPendente.idMov}"
 								title="${anexoPendente.descricao}" style="text-decoration: none">
 									${anexoPendente.descricao}
 								</a>

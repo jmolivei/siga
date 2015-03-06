@@ -118,7 +118,7 @@
 							</tr>
 							<tr>
 								<td>Descrição:</td>
-								<td><input type="text" name="descrMov" maxlength="80" size="80" /></td>
+								<td><input type="text" name="descrMov" maxlength="80" size="80" value="${descrMov}" /></td>
 							</tr>
 							<tr>
 								<td><label>Arquivo:</label></td>
@@ -141,8 +141,18 @@
 											<label>A anexação deste arquivo resolve as seguintes pendências:</label>
 											<c:forEach var="mov" items="${mobilCompletoVO.movs}">
 												<c:if test="${(not mov.cancelada) and (mov.idTpMov eq 57)}">
+		     										<c:set var="checkBoxSelecionada" value=""/>
+		     										
+		     										<c:if test="${(empty idMovPendencia)}">
+													   <c:set var="checkBoxSelecionada" value="checked"/>
+		     										</c:if>
+		     										
+													<c:if test="${(mov.idMov == idMovPendencia)}">
+													   <c:set var="checkBoxSelecionada" value="checked"/>
+													</c:if>
+												
 													<label class="gt-form-element-label"><input type="checkbox"
-														class="gt-form-checkbox" name="pendencia_de_anexacao" value="${mov.idMov}">
+														class="gt-form-checkbox" name="pendencia_de_anexacao" value="${mov.idMov}" ${checkBoxSelecionada}/>
 															${mov.descricao}</label>
 												</c:if>
 											</c:forEach>
