@@ -17,8 +17,7 @@ import org.mvel2.templates.TemplateRuntime;
 
 public class SigaDesign {
 
-	static CompiledTemplate tCabecalho = template("cabecalho.html");
-	static CompiledTemplate tRodape = template("rodape.html");
+	static CompiledTemplate tPagina = template("pagina.html");
 
 	private static CompiledTemplate template(String file) {
 		String template;
@@ -34,41 +33,28 @@ public class SigaDesign {
 			return null;
 		}
 	}
-	
-	
-	public static String getJSFHeader(){
-		
-		
+
+	public static String getJSFHeader() {
+
 		return null;
 	}
 
 	public static void main(String[] args) {
-		// <c:set var="ambiente">
-		// <c:if
-		// test="${f:resource('isVersionTest') or f:resource('isBaseTest')}">
-		// <c:if test="${f:resource('isVersionTest')}">SISTEMA</c:if>
-		// <c:if
-		// test="${f:resource('isVersionTest') and f:resource('isBaseTest')}"> E
-		// </c:if>
-		// <c:if test="${f:resource('isBaseTest')}">BASE</c:if> DE TESTES
-		// </c:if>
-		// </c:set>
-		// <c:if test="${not empty ambiente}">
-		// <c:set var="env" scope="request">${ambiente}</c:set>
-		// </c:if>
-
 		Map<String, Boolean> permissoes = new HashMap<>();
 		List<Menu> menu = new ArrayList<>();
 		List<Substituicao> substituicoes = new ArrayList<>();
 
-		cabecalho("titulo", null, null, null, null, false, false, false,
-				"RENATO DO AMARAL CRIVANO MACHADO", "RJSESIA",
+		String s = pagina("titulo", null, null, null, null, false, false,
+				false, "RENATO DO AMARAL CRIVANO MACHADO", "RJSESIA",
 				"RENATO DO AMARAL CRIVANO MACHADO", "RJSESIA", permissoes,
 				menu, substituicoes, null);
+
+		String r = rodape(s);
+		System.out.println(r);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static String cabecalho(String titulo, String ambiente, String meta,
+	public static String pagina(String titulo, String ambiente, String meta,
 			String js, String onLoad, boolean popup, boolean desabilitarBusca,
 			boolean desabilitarMenu, String nomeCadastrante,
 			String siglaLotaCadastrante, String nomeTitular,
@@ -106,23 +92,50 @@ public class SigaDesign {
 		vars.put("menu_principal", menus);
 		vars.put("head_complemento", complementoHead);
 
-		//tCabecalho = reler("cabecalho.html");
-		String output = (String) TemplateRuntime.execute(tCabecalho, vars);
-		//System.out.println(output);
+		// tCabecalho = reler("cabecalho.html");
+		String output = (String) TemplateRuntime.execute(tPagina, vars);
+		// System.out.println(output);
 		return output;
 	}
-	
+
+	private static String split(String pagina, String ini, String fim) {
+		String s = ini == null ? pagina : pagina.substring(pagina.indexOf(ini)
+				+ ini.length());
+		if (fim != null)
+			s = s.substring(0, s.indexOf(fim));
+		return s;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static String rodape(boolean popup, boolean paginaDeErro) {
+	public static String cabecalho(String pagina) {
+		return split(pagina, null, "<!-- fim cabecalho -->");
+	}
 
-		Map vars = new HashMap();
-		vars.put("popup", popup);
-		vars.put("pagina_de_erro", paginaDeErro);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static String rodape(String pagina) {
+		return split(pagina, "<!-- inicio rodape -->", null);
+	}
 
-		String output = (String) TemplateRuntime.execute(tRodape, vars);
-		// System.out.println(output);
+	public static String cabecalhoHead(String pagina) {
+		String s = cabecalho(pagina);
+		s = s.substring(s.indexOf("<head>") + 6);
+		s = s.substring(0, s.indexOf("</head>"));
 
-		return output;
+		return s;
+	}
+
+	public static String cabecalhoBody(String pagina) {
+		String s = cabecalho(pagina);
+		int iBody = s.indexOf("<body");
+		s = s.substring(s.indexOf(">", iBody) + 1);
+
+		return s;
+	}
+
+	public static String rodapeBody(String pagina) {
+		String s = rodape(pagina);
+		s = s.substring(0, s.indexOf("</body>"));
+		return s;
 	}
 
 	public static List<Menu> menuPrincipal() {

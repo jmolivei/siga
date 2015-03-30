@@ -1,0 +1,4 @@
+<jboss-web>
+	<context-root>sigamodulo</context-root>
+	<disable-cross-context>false</disable-cross-context>
+</jboss-web>

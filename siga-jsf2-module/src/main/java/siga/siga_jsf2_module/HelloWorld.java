@@ -24,6 +24,8 @@ import br.gov.jfrj.siga.libs.design.Substituicao;
 public class HelloWorld {
 	private final String text = "Hello, World!";
 
+	private String pagina;
+
 	private String letters;
 
 	private String numbers;
@@ -35,6 +37,21 @@ public class HelloWorld {
 
 	@PostConstruct
 	public void initialize() {
+		Map<String, Boolean> permissoes = new HashMap();
+		List<Menu> menus = new Menu.MenuBuilder()
+				.menu("sitemap", "Cadastro", null, true)
+
+				.item("cube", "Documentos", "#",
+						"SIGA;DOC:Módulo de Documentos")
+
+				.build();
+
+		List<Substituicao> substituicoes = new ArrayList();
+
+		this.pagina = SigaDesign.pagina("titulo da página", "ambiente", null,
+				null, null, false, false, false, "JOHN DOE", "SESIA",
+				"JANE DOE", "CSIS", permissoes, menus, substituicoes, null);
+
 		System.out
 				.println(this.getClass().getSimpleName() + " was constructed");
 	}
@@ -76,52 +93,22 @@ public class HelloWorld {
 		this.email = email;
 	}
 
-	public String getCabecalho() {
-
-		Map<String, Boolean> permissoes = new HashMap();
-		List<Menu> menus = new Menu.MenuBuilder()
-		.menu("sitemap", "Cadastro", null, true)
-
-		.item("cube", "Documentos",
-				"#",
-				"SIGA;DOC:Módulo de Documentos")
-
-		.build();
-		
-		List<Substituicao> substituicoes = new ArrayList();
-
-		return SigaDesign.cabecalho("titulo da página", "ambiente", null, null,
-				null, false, false, false, "JOHN DOE", "SESIA", "JANE DOE",
-				"CSIS", permissoes, menus, substituicoes, null);
-	}
-
 	public String getCabecalhoHead() {
-		String s = getCabecalho();
-		s = s.substring(s.indexOf("<head>") + 6);
-		s = s.substring(0, s.indexOf("</head>"));
-
-		return s;
+		return SigaDesign.cabecalhoHead(pagina);
 	}
 
 	public String getCabecalhoBody() {
-		String s = getCabecalho();
-		int iBody = s.indexOf("<body");
-		s = s.substring(s.indexOf(">", iBody) + 1);
-
-		return s;
+		return SigaDesign.cabecalhoBody(pagina);
 	}
 
 	public String getRodapeBody() {
-		String s = SigaDesign.rodape(false, false);
-		s = s.substring(0, s.indexOf("</body>"));
-		return s;
+		return SigaDesign.rodapeBody(pagina);
 	}
-	
-	
-	public String teste(){
-		
+
+	public String teste() {
+
 		System.out.println();
 		return null;
 	}
-	
+
 }

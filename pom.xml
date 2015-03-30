@@ -19,6 +19,7 @@
 		<module>siga-module</module>
 		<module>siga-vraptor-module</module>
 		<module>siga-jsf2-module</module>
+		<module>sigamodulo</module>
 		<module>siga-ldap</module>
 		<module>siga</module>
 		<module>sigaidp</module>
@@ -269,6 +270,11 @@
 			<dependency>
 				<groupId>siga</groupId>
 				<artifactId>siga-jsf2-module</artifactId>
+				<version>${siga.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>siga</groupId>
+				<artifactId>sigamodulo</artifactId>
 				<version>${siga.version}</version>
 			</dependency>
 			<dependency>
