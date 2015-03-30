@@ -8,36 +8,44 @@
 	template="/WEB-INF/templates/default.xhtml">
 	<ui:define name="content">
 
-		
+
 		<h:head>
-			<title>#{helloWorld.text}</title>
+			<title>#{helloWorld.text}</title> 
 		</h:head>
 
 		<h:form id="bv">
-			<div style="display:none;">
-			<rich:toolbar width="85%" height="21px"
-				style="float:right; left: 0px ;  padding: 0px; border-width: 0px; margin: 0px;position:relative; z-index: 2;"
-				rendered="true">
-				<rich:toolbarGroup id="toolBarGroupTabelas">
-					<rich:dropDownMenu id="dropDownMenuTabelas" label="Tabelas"
-						style=" width : 55px; ">
+			<div style="display: block;">
+				<rich:toolbar width="85%" height="21px"
+					style="float:right; left: 0px ;  padding: 0px; border-width: 0px; margin: 0px;position:relative; z-index: 2;"
+					rendered="true">
+					<rich:toolbarGroup id="toolBarGroupTabelas">
+						<rich:dropDownMenu label="Tabelas" style=" width : 55px; ">
 
-						<rich:menuItem mode="server"
-							label="Curso"
-							action="#{helloWorld.teste}"
-							immediate="true"
-							id="menuitem1">
-						</rich:menuItem>
-						<rich:menuItem mode="server"
-							label="Institui&#231;&#227;o"
-							action="#{helloWorld.teste}"
-							immediate="true">
-						</rich:menuItem>
-						
-					</rich:dropDownMenu>
-				</rich:toolbarGroup>
-			</rich:toolbar>
+							<rich:menuItem mode="server" label="Curso"
+								action="#{helloWorld.teste}" immediate="true">
+							</rich:menuItem>
+
+							<rich:menuItem mode="server" label="Institui&#231;&#227;o"
+								action="#{helloWorld.teste}" immediate="true">
+							</rich:menuItem>
+
+						</rich:dropDownMenu>
+
+						<rich:dropDownMenu label="Tabelas 2" style=" width : 55px; ">
+
+							<rich:menuItem mode="server" label="Curso 2"
+								action="#{helloWorld.teste}" immediate="true">
+							</rich:menuItem>
+
+							<rich:menuItem mode="server" label="Institui&#231;&#227;o 2"
+								action="#{helloWorld.teste}" immediate="true">
+							</rich:menuItem>
+
+						</rich:dropDownMenu>
+					</rich:toolbarGroup>
+				</rich:toolbar>
 			</div>
 		</h:form>
 	</ui:define>
 </ui:composition>
+
