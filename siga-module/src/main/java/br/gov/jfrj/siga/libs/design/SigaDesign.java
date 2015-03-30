@@ -34,6 +34,13 @@ public class SigaDesign {
 			return null;
 		}
 	}
+	
+	
+	public static String getJSFHeader(){
+		
+		
+		return null;
+	}
 
 	public static void main(String[] args) {
 		// <c:set var="ambiente">
@@ -104,7 +111,7 @@ public class SigaDesign {
 		//System.out.println(output);
 		return output;
 	}
-
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static String rodape(boolean popup, boolean paginaDeErro) {
 

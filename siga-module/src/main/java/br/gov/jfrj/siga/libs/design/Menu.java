@@ -6,7 +6,7 @@ import java.util.List;
 public class Menu {
 	private String icone;
 	private String titulo;
-	private String url;
+	private Object url;
 	private boolean ativo;
 	private List<Menu> itens = new ArrayList<Menu>();
 
@@ -34,11 +34,11 @@ public class Menu {
 		this.titulo = titulo;
 	}
 
-	public String getUrl() {
+	public Object getUrl() {
 		return url;
 	}
 
-	public void setUrl(String url) {
+	public void setUrl(Object url) {
 		this.url = url;
 	}
 
@@ -48,6 +48,14 @@ public class Menu {
 
 	public void setItens(List<Menu> itens) {
 		this.itens = itens;
+	}
+	
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 	public static class MenuBuilder {

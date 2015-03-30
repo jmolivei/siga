@@ -7,8 +7,12 @@
 	<h:outputText value="#{helloWorld.cabecalhoHead}" escape="false" />
 </h:head>
 <h:body>
+	
 	<h:outputText value="#{helloWorld.cabecalhoBody}" escape="false" />
+	<h:form>
 	<ui:insert name="content">[Template content will be inserted here]</ui:insert>
+	</h:form>
 	<h:outputText value="#{helloWorld.rodapeBody}" escape="false" />
+	
 </h:body>
 </html>

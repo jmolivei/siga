@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -20,7 +20,7 @@ import br.gov.jfrj.siga.libs.design.SigaDesign;
 import br.gov.jfrj.siga.libs.design.Substituicao;
 
 @ManagedBean
-@RequestScoped
+@SessionScoped
 public class HelloWorld {
 	private final String text = "Hello, World!";
 
@@ -83,7 +83,7 @@ public class HelloWorld {
 		.menu("sitemap", "Cadastro", null, true)
 
 		.item("cube", "Documentos",
-				"/siga/app/expediente/doc/listar?primeiraVez=sim",
+				"#",
 				"SIGA;DOC:Módulo de Documentos")
 
 		.build();
@@ -116,4 +116,12 @@ public class HelloWorld {
 		s = s.substring(0, s.indexOf("</body>"));
 		return s;
 	}
+	
+	
+	public String teste(){
+		
+		System.out.println();
+		return null;
+	}
+	
 }

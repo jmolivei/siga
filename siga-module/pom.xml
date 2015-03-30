@@ -17,11 +17,11 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 
-		<!-- Siga -->
+		<!-- Siga 
 		<dependency>
 			<groupId>siga</groupId>
 			<artifactId>siga-base</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.mvel</groupId>
