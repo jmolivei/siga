@@ -56,6 +56,7 @@ import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
 import util.AtualizacaoLista;
+import reports.SrRelDadosBase;
 import util.SrSolicitacaoAtendidos;
 import util.SrSolicitacaoFiltro;
 import util.SrSolicitacaoItem;
@@ -1681,4 +1682,18 @@ public class Application extends SigaApplication {
 		configuracao.salvar();
 		return configuracao.toVO().toJson();
 	}
+	
+	public static void gerarDadosRelatorio() throws Exception {
+		assertAcesso("REL:Relatorio");
+
+		Map<String, String> parametros = new HashMap<String, String>();
+		parametros.put("dtIni", "01/03/2015");
+		parametros.put("dtFim", "30/03/2015");
+		parametros.put("atendente", "STI-HDK");
+		
+		SrRelDadosBase rel = new SrRelDadosBase(parametros);
+		rel.gerar();
+		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar1472.xls");
+	}
+
 }

@@ -28,6 +28,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
 import ar.com.fdvs.dj.domain.builders.ColumnBuilderException;
 import ar.com.fdvs.dj.domain.builders.DJBuilderException;
 
@@ -286,6 +287,16 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 
 		htmlExp.exportReport();
 		return sb;
+	}
+	
+	public void getRelatorioExcel(String pathDestino) throws JRException {
+		JRXlsExporter excelExp = new JRXlsExporter();
+		
+		excelExp.setParameter(JRExporterParameter.JASPER_PRINT,
+				relatorio.getRelatorioJasperPrint());
+		
+		excelExp.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, pathDestino);
+		excelExp.exportReport(); 
 	}
 
 }
