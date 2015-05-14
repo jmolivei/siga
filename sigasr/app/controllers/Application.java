@@ -1688,14 +1688,15 @@ public class Application extends SigaApplication {
 		//assertAcesso("REL:Relatorio");
 
 		Map<String, Object> parametros = new HashMap<String, Object>();
-		parametros.put("dtIni", "06/04/2015");
-		parametros.put("dtFim", "07/04/2015");
+		parametros.put("dtIni", "01/04/2015");
+		parametros.put("dtFim", "30/04/2015");
 		parametros.put("atendente", "STI-HDK");
 		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
 		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");
+		
 	}
 
 }
