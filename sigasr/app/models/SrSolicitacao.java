@@ -733,6 +733,14 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				tiposPrincipais);
 	}
 
+	public Set<SrMovimentacao> getMovimentacaoSetCalculoAtendimento(boolean todoOContexto) {
+		List<Long> tiposPrincipais = Arrays.asList(TIPO_MOVIMENTACAO_ESCALONAMENTO,
+				TIPO_MOVIMENTACAO_FECHAMENTO, TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO, 
+				TIPO_MOVIMENTACAO_REABERTURA);
+		
+		return getMovimentacaoSet(false, null, false, todoOContexto, false, false, tiposPrincipais);
+		
+	}
 	public Set<SrMovimentacao> getMovimentacaoSet(boolean considerarCanceladas,
 			Long tipoMov, boolean ordemCrescente, boolean todoOContexto,
 			boolean apenasPrincipais, boolean inversoJPA,
@@ -2795,5 +2803,37 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		}
 		int size = historicoAcao.size();
 		return historicoAcao.get(size - 1);
+	}
+	
+	public Set<SrAtendimento> getAtendimentos(boolean todoOContexto) {
+		Set<SrMovimentacao> listaMov = getMovimentacaoSetCalculoAtendimento(todoOContexto);
+		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
+		SrAtendimento atendimento = null;
+		if (!isFechado()) {
+			atendimento = new SrAtendimento();
+			atendimento.setDataFinal(new Date());
+		}
+		for (SrMovimentacao mov : listaMov) {	
+			//marca inicio de atendimento
+			if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO
+					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO
+					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_REABERTURA) {
+				atendimento.setDataInicio(mov.dtIniMov);
+				atendimento.setTempoDecorrido(getTempoDecorrido(atendimento.getDataInicio(),
+						atendimento.getDataFinal()));
+				atendimento.setLotacaoAtendente(mov.lotaAtendente);
+				atendimento.setSolicitacao(this);
+				atendimento.setFaixa(atendimento.definirFaixaDeHoras());
+				
+				listaAtendimentos.add(atendimento);
+			}	
+			//marca fim de atendimento
+			if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_FECHAMENTO 
+					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
+				atendimento = new SrAtendimento();
+				atendimento.setDataFinal(mov.dtIniMov);
+			}
+		}
+		return listaAtendimentos;
 	}
 }

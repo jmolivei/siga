@@ -44,6 +44,7 @@ import models.SrUrgencia;
 import models.vo.PaginaItemConfiguracao;
 import models.vo.SelecionavelVO;
 import models.vo.SrSolicitacaoListaVO;
+import net.sf.jasperreports.engine.JRParameter;
 
 import org.joda.time.LocalDate;
 
@@ -1684,16 +1685,17 @@ public class Application extends SigaApplication {
 	}
 	
 	public static void gerarDadosRelatorio() throws Exception {
-		assertAcesso("REL:Relatorio");
+		//assertAcesso("REL:Relatorio");
 
-		Map<String, String> parametros = new HashMap<String, String>();
-		parametros.put("dtIni", "01/03/2015");
-		parametros.put("dtFim", "30/03/2015");
+		Map<String, Object> parametros = new HashMap<String, Object>();
+		parametros.put("dtIni", "06/04/2015");
+		parametros.put("dtFim", "07/04/2015");
 		parametros.put("atendente", "STI-HDK");
+		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
-		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar1472.xls");
+		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");
 	}
 
 }

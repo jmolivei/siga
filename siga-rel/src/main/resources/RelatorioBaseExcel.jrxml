@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Atendimentos" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="832" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="secaoUsuario" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{secaoUsuario}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dataInicio" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{dataInicio}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dataFim" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{dataFim}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lotacao" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{lotacao}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="siglalotacao" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{siglalotacao}]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select
+f.id_forma_doc,
+descr_forma_doc,
+id_mod,
+nm_mod,
+concat(concat(concat(concat(concat(concat(to_char(c.cod_assunto_principal, 'FM0'),
+to_char(c.cod_assunto_secundario, 'FM0')), '.'),
+to_char(c.cod_classe, 'FM0')),
+to_char(c.cod_subclasse, 'FM00')), '.'),
+to_char(c.cod_atividade, 'FM00')),
+concat(concat(concat(concat(concat(concat(to_char(v.cod_assunto_principal, 'FM0'),
+to_char(v.cod_assunto_secundario, 'FM0')), '.'), to_char(v.cod_classe, 'FM0')),
+to_char(v.cod_subclasse, 'FM00')), '.'), to_char(v.cod_atividade, 'FM00'))
+from ex_forma_documento f,
+ex_modelo m,
+ex_classificacao c,
+ex_classificacao v
+where f.id_forma_doc = m.id_forma_doc and  m.id_classificacao = c.id_classificacao (+)
+and m.id_class_criacao_via = v.id_classificacao (+)
+order by descr_forma_doc,nm_mod]]>
+	</queryString>
+	<field name="secaoUsuario" class="java.lang.String"/>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="68"/>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="40"/>
+	</columnHeader>
+	<detail>
+		<band height="22"/>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="10"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="13"/>
+	</lastPageFooter>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>
