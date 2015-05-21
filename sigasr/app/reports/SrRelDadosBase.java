@@ -80,7 +80,7 @@ public class SrRelDadosBase extends RelatorioTemplate {
 				+ "and s.dtReg >= :dataIni and s.dtReg <= :dataFim group by s.idSolicitacao) "
 				+ "order by sol.dtReg");
 		
-		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'JFRJ-SR-2015/00382'");
+		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'TRF2-SR-2015/05282'"); //TRF2-SR-2015/05282, TRF2-SR-2015/05228, TRF2-SR-2015/05780
 				
 		Date dtIni = formatter.parse((String) parametros.get("dtIni") + " 00:00:00");
 		query.setParameter("dataIni", dtIni, TemporalType.TIMESTAMP);
@@ -92,7 +92,8 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		for (SrSolicitacao sol : lista) {
 			if (sol.isCancelado())
 				continue;
-			listaAtendimento = sol.getAtendimentos(false);
+			listaAtendimento = sol.getAtendimentosSolicitacaoPai();
+			//listaAtendimento = sol.getAtendimentos(false);
 			for (SrAtendimento atendimento : listaAtendimento) {
 				if (atendimento.getLotacaoAtendente().getSigla().equals(parametros.get("atendente"))) {
 					listaFinal.add(sol.codigo);

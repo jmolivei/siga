@@ -921,7 +921,16 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 			listaCompleta.addAll(filha.getSolicitacaoFilhaSetRecursivo());
 		return listaCompleta;
 	}
-
+	
+	public SrSolicitacao  getUltimaSolFilhaFechadaOuCancelada() {
+		for (SrMovimentacao mov: getMovimentacaoSetComCanceladosTodoOContexto()) {
+			if (mov.solicitacao.isFilha() && 
+					(mov.solicitacao.isFechado() || mov.solicitacao.isCancelado()))
+			return mov.solicitacao;
+		}
+		return null;
+	}
+	
 	public boolean isPai() {
 		return getSolicitacaoFilhaSet() != null
 				&& getSolicitacaoFilhaSet().size() > 0;
@@ -2834,6 +2843,44 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				atendimento.setDataFinal(mov.dtIniMov);
 			}
 		}
+		return listaAtendimentos;
+	}
+	
+	public Set<SrAtendimento> getAtendimentosSolicitacaoPai() {
+		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
+		Set<SrSolicitacao> filhas = getSolicitacaoFilhaSet();
+		SrSolicitacao ultimaFilha = null;
+		SrAtendimento atendimento = null;
+		if (isAFechar() || isFechado()) { // pensar em outra coisa para condicao para nao ter repeticao
+			atendimento = new SrAtendimento();
+			if (isFechado()) 
+				atendimento.setDataFinal(getDtEfetivoFechamento());	
+			else
+				atendimento.setDataFinal(new Date());			
+			ultimaFilha = getUltimaSolFilhaFechadaOuCancelada();
+			atendimento.setDataInicio(ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento() 
+					: ultimaFilha.getDtEfetivoFechamento());
+			atendimento.setTempoDecorrido(getTempoDecorrido(atendimento.getDataInicio(),
+					atendimento.getDataFinal()));
+			atendimento.setLotacaoAtendente(getLotaAtendente());
+			atendimento.setSolicitacao(this);
+			atendimento.setFaixa(atendimento.definirFaixaDeHoras());
+			
+			listaAtendimentos.add(atendimento);
+		}
+		for (SrSolicitacao filha : filhas) {
+			atendimento = new SrAtendimento();
+			atendimento.setDataInicio(this.getDtInicioAtendimento());
+			atendimento.setDataFinal(filha.getDtInicioAtendimento());	
+			atendimento.setTempoDecorrido(getTempoDecorrido(atendimento.getDataInicio(),
+					atendimento.getDataFinal()));
+			atendimento.setLotacaoAtendente(getLotaAtendente());
+			atendimento.setSolicitacao(this);
+			atendimento.setFaixa(atendimento.definirFaixaDeHoras());
+			
+			listaAtendimentos.add(atendimento);
+		}
+		
 		return listaAtendimentos;
 	}
 }

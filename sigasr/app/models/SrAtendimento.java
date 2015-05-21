@@ -117,9 +117,12 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	public int compareTo(SrAtendimento o) {
 		if (this != null && o != null) {
 			if (this.getSolicitacao().codigo.equals(o.getSolicitacao().codigo))
-				return this.getDataInicio().compareTo(o.getDataInicio());
+				if (this.getDataInicio().equals(o.getDataInicio()))
+					return this.getDataFinal().compareTo(o.getDataFinal());
+				else 
+					return this.getDataInicio().compareTo(o.getDataInicio());
 			else
-				return this.getSolicitacao().dtReg.compareTo(o.getSolicitacao().dtReg);
+				return this.getSolicitacao().idSolicitacao.compareTo(o.getSolicitacao().idSolicitacao);
 		}
 		return 0;
 	}
