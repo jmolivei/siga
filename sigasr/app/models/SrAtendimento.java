@@ -14,7 +14,25 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	private SrValor tempoDecorrido;
 	private SrFaixa faixa;
 	private DpLotacao lotacaoAtendente;
+	private DpLotacao lotacaoAtendenteDestino;
+	private String tipoAtendimento;
+	private String classificacao;
 	
+	public SrAtendimento(SrSolicitacao solicitacao, Date dataInicio,
+			Date dataFinal, SrValor tempoDecorrido,
+			DpLotacao lotacaoAtendente, String tipoAtendimento) {
+		this.solicitacao = solicitacao;
+		this.dataInicio = dataInicio;
+		this.dataFinal = dataFinal;
+		this.tempoDecorrido = tempoDecorrido;
+		this.lotacaoAtendente = lotacaoAtendente;
+		this.tipoAtendimento = tipoAtendimento;
+	}
+	
+	public SrAtendimento() {
+		
+	}
+
 	public SrSolicitacao getSolicitacao() {
 		return solicitacao;
 	}
@@ -61,6 +79,30 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 
 	public void setLotacaoAtendente(DpLotacao lotacaoAtendente) {
 		this.lotacaoAtendente = lotacaoAtendente;
+	}
+	
+	public DpLotacao getLotacaoAtendenteDestino() {
+		return lotacaoAtendenteDestino;
+	}
+
+	public void setLotacaoAtendenteDestino(DpLotacao lotacaoAtendenteDestino) {
+		this.lotacaoAtendenteDestino = lotacaoAtendenteDestino;
+	}
+	
+	public String getTipoAtendimento() {
+		return tipoAtendimento;
+	}
+
+	public void setTipoAtendimento(String tipoAtendimento) {
+		this.tipoAtendimento = tipoAtendimento;
+	}
+	
+	public String getClassificacao() {
+		return classificacao;
+	}
+
+	public void setClassificacao(String classificacao) {
+		this.classificacao = classificacao;
 	}
 
 	public String getDataInicioDDMMYYYYHHMMSS() {

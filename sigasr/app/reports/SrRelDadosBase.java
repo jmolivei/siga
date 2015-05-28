@@ -62,7 +62,10 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		this.addColuna("Data de Fim Atendimento", 25, RelatorioRapido.CENTRO, false);
 		this.addColuna("Tempo de Atendimento", 40, RelatorioRapido.DIREITA, false);
 		this.addColuna("Faixa", 20, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Fechada?", 15, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Tipo de Atendimento", 30, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Proximo Atendente", 20, RelatorioRapido.ESQUERDA, false);
+		//this.addColuna("Classificacao", 70, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Solicitacao Fechada?", 15, RelatorioRapido.ESQUERDA, false);
 		return this;
 	}
 
@@ -79,8 +82,11 @@ public class SrRelDadosBase extends RelatorioTemplate {
 				+ "where (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) and mov.lotaAtendente.siglaLotacao = :lotaAtendente " 
 				+ "and s.dtReg >= :dataIni and s.dtReg <= :dataFim group by s.idSolicitacao) "
 				+ "order by sol.dtReg");
-		
-		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'TRF2-SR-2015/05282'"); //TRF2-SR-2015/05282, TRF2-SR-2015/05228, TRF2-SR-2015/05780
+	
+		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'JFRJ-SR-2015/00318'");						
+		//('TRF2-SR-2015/05228', 'TRF2-SR-2015/05755', "
+		//		+ "'TRF2-SR-2015/05290', 'TRF2-SR-2015/05282', 'TRF2-SR-2015/05356', 'TRF2-SR-2015/05780') order by s.dtReg"); */
+		//TRF2-SR-2015/05356, TRF2-SR-2015/05755, TRF2-SR-2015/05290, TRF2-SR-2015/05282, TRF2-SR-2015/05228, TRF2-SR-2015/05780
 				
 		Date dtIni = formatter.parse((String) parametros.get("dtIni") + " 00:00:00");
 		query.setParameter("dataIni", dtIni, TemporalType.TIMESTAMP);
@@ -92,19 +98,23 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		for (SrSolicitacao sol : lista) {
 			if (sol.isCancelado())
 				continue;
-			listaAtendimento = sol.getAtendimentosSolicitacaoPai();
-			//listaAtendimento = sol.getAtendimentos(false);
+			if (sol.isPai())
+				listaAtendimento = sol.getAtendimentosSolicitacaoPai();
+			else 
+				listaAtendimento = sol.getAtendimentos(false);	
 			for (SrAtendimento atendimento : listaAtendimento) {
 				if (atendimento.getLotacaoAtendente().getSigla().equals(parametros.get("atendente"))) {
 					listaFinal.add(sol.codigo);
 					listaFinal.add(sol.getDtRegDDMMYYYYHHMM());
-					//listaFinal.add(sol.solicitante.getNomePessoaAI());
-					//listaFinal.add(sol.solicitante.getNomePessoaAI() + " - " + sol.solicitante.getSigla());
 					listaFinal.add(atendimento.getLotacaoAtendente().getSiglaCompleta());
 					listaFinal.add(atendimento.getDataInicioDDMMYYYYHHMMSS());
 					listaFinal.add(atendimento.getDataFinalDDMMYYYYHHMMSS());
 					listaFinal.add(atendimento.getTempoDecorrido().toString());
 					listaFinal.add(atendimento.definirFaixaDeHoras().descricao);
+					listaFinal.add(atendimento.getTipoAtendimento());
+					listaFinal.add(atendimento.getLotacaoAtendenteDestino() != null ? 
+							atendimento.getLotacaoAtendenteDestino().getSiglaCompleta() : "");
+					//listaFinal.add(atendimento.getClassificacao());
 					listaFinal.add(sol.isFechado() ? "Sim" : "Nao" );
 				}
 			}
