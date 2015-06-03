@@ -187,6 +187,10 @@
 			<url-pattern>/autenticar.action</url-pattern>
 		</web-resource-collection>
 		<web-resource-collection>
+			<web-resource-name>arquivoAutenticado</web-resource-name>
+			<url-pattern>/arquivoAutenticado.action</url-pattern>
+		</web-resource-collection>	
+		<web-resource-collection>
 			<web-resource-name>imagens</web-resource-name>
 			<url-pattern>/imagens/*</url-pattern>
 		</web-resource-collection>
