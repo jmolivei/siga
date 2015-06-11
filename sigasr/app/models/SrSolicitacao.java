@@ -2832,6 +2832,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		if (!isFechado()) {
 			atendimento = new SrAtendimento();
 			atendimento.setDataFinal(new Date());
+			atendimento.setClassificacao(this.acao.toString());
 		}
 		for (SrMovimentacao mov : listaMov) {	
 			//marca inicio de atendimento
@@ -2855,12 +2856,14 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				atendimento.setTipoAtendimento(mov.tipoMov.nome);
 				if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
 					atendimento.setLotacaoAtendenteDestino(mov.lotaAtendente);
-					atendimento.setClassificacao(mov.itemConfiguracao.toString() + ", " + 
-							mov.acao.toString());
+					//atendimento.setClassificacao(mov.itemConfiguracao.toString() + ", " + 
+					//		mov.acao.toString());
+					atendimento.setClassificacao(mov.acao.toString());
 				}
 				else
-					atendimento.setClassificacao(getItemAtual().toString() + ", " + 
-							getAcaoAtual().toString());
+					//atendimento.setClassificacao(getItemAtual().toString() + ", " + 
+					//		getAcaoAtual().toString());
+					atendimento.setClassificacao(getAcaoAtual().toString());
 			}
 		}
 		return listaAtendimentos;
@@ -2874,22 +2877,27 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		Date dataFinalPai, dataFinalFilha = null; 
 		Date dtFinal = null; Date dtInicio = null;
 		DpLotacao lotacaoDestino = null;
+		String classificacao = null;
 		
 		if (ultimaFilha != null)		
 			dataFinalFilha = ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento()
 					: ultimaFilha.getDtEfetivoFechamento();
-		if (isAFechar() || isFechado()) {
-			if (isFechado()) 
-				dataFinalPai = getDtEfetivoFechamento();	
-			else
+		if ((isAFechar() || isFechado()) && this.idSolicitacao != 17892 && this.idSolicitacao != 18362
+				&& this.idSolicitacao != 21956) {
+			if (isFechado()) {
+				dataFinalPai = getDtEfetivoFechamento();
+				classificacao = "Fechamento";
+			}
+			else {
 				dataFinalPai = new Date();	
+				classificacao = "A Fechar";
+			}
 			atendimento = new SrAtendimento(this, dataFinalFilha, dataFinalPai, 
 					getTempoAtendimentoReal(dataFinalFilha, dataFinalPai),getLotaAtendente(), 
-					"Fechamento");
+					classificacao);
 			atendimento.setFaixa(atendimento.definirFaixaDeHoras());
 			atendimento.setLotacaoAtendenteDestino(null);
-			atendimento.setClassificacao(getItemAtual().toString() + ", " + 
-					getAcaoAtual().toString());
+			atendimento.setClassificacao(getAcaoAtual().toString());
 			listaAtendimentos.add(atendimento);
 		}
 		//incluir a REABERTURA
@@ -2902,12 +2910,15 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 							"Escalonamento com sol. filha");
 					atendimento.setFaixa(atendimento.definirFaixaDeHoras());
 					atendimento.setLotacaoAtendenteDestino(mov.lotaAtendente);
+					//atendimento.setClassificacao(ultimaFilha.acao.toString());
+					atendimento.setClassificacao(this.acao.toString());
 					listaAtendimentos.add(atendimento);
 				}
 				else { 
 					if (mov.solicitacao.isFilha()) {
 						dtFinal = mov.solicitacao.getDtInicioAtendimento();
 						lotacaoDestino = mov.lotaAtendente;
+						//classificacao = mov.solicitacao.acao.toString();
 					}
 					if (mov.solicitacao.equals(this)) {
 						dtInicio = getDtInicioAtendimento();
@@ -2916,6 +2927,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 								"Escalonamento com sol. filha");
 						atendimento.setFaixa(atendimento.definirFaixaDeHoras());
 						atendimento.setLotacaoAtendenteDestino(lotacaoDestino);
+						atendimento.setClassificacao(this.acao.toString());
 						listaAtendimentos.add(atendimento);
 					}
 				}
@@ -2933,6 +2945,8 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		int diasNaoUteis = 0; 
 		
 		intervaloDeTrabalho = getIntervaloDeTempo(8, 20, dataInicio);
+		if (inicio.isAfter(fim))
+			System.out.println(("SOLICITACAO: " + this.codigo + ", id: " + this.idSolicitacao));
 		intervaloEfetivoAtendimento = new Interval(inicio, fim);
 		if (intervaloDeTrabalho.contains(intervaloEfetivoAtendimento))
 			return getTempoDecorrido(dataInicio, dataFinal);

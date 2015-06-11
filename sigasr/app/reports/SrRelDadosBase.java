@@ -59,20 +59,23 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		//this.addColuna("Solicitante", 50, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Atendente", 20, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Data de Inicio Atendimento", 25, RelatorioRapido.CENTRO, false);
+		//this.addColuna("Data de Inicio Atendimento", 25, RelatorioRapido.CENTRO, false, Date.class);
 		this.addColuna("Data de Fim Atendimento", 25, RelatorioRapido.CENTRO, false);
 		this.addColuna("Tempo de Atendimento", 40, RelatorioRapido.DIREITA, false);
+		//this.addColuna("Faixa", 20, RelatorioRapido.ESQUERDA, true);
 		this.addColuna("Faixa", 20, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Tipo de Atendimento", 30, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Proximo Atendente", 20, RelatorioRapido.ESQUERDA, false);
-		//this.addColuna("Classificacao", 70, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Classificacao", 70, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Solicitacao Fechada?", 15, RelatorioRapido.ESQUERDA, false);
+		
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection processarDados() throws ParseException {
-		List<String> listaFinal = new LinkedList<String>();
+		List<Object> listaFinal = new LinkedList<Object>();
 		Set<SrAtendimento> listaAtendimento = null;
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 		
@@ -83,8 +86,8 @@ public class SrRelDadosBase extends RelatorioTemplate {
 				+ "and s.dtReg >= :dataIni and s.dtReg <= :dataFim group by s.idSolicitacao) "
 				+ "order by sol.dtReg");
 	
-		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'JFRJ-SR-2015/00318'");						
-		//('TRF2-SR-2015/05228', 'TRF2-SR-2015/05755', "
+		//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'TRF2-SR-2015/05356'");						
+		//('TRF2-SR-2015/05228', 'TRF2-SR-2015/05755', JFRJ-SR-2015/00318"
 		//		+ "'TRF2-SR-2015/05290', 'TRF2-SR-2015/05282', 'TRF2-SR-2015/05356', 'TRF2-SR-2015/05780') order by s.dtReg"); */
 		//TRF2-SR-2015/05356, TRF2-SR-2015/05755, TRF2-SR-2015/05290, TRF2-SR-2015/05282, TRF2-SR-2015/05228, TRF2-SR-2015/05780
 				
@@ -107,14 +110,16 @@ public class SrRelDadosBase extends RelatorioTemplate {
 					listaFinal.add(sol.codigo);
 					listaFinal.add(sol.getDtRegDDMMYYYYHHMM());
 					listaFinal.add(atendimento.getLotacaoAtendente().getSiglaCompleta());
+					//listaFinal.add(atendimento.getDataInicio());
 					listaFinal.add(atendimento.getDataInicioDDMMYYYYHHMMSS());
 					listaFinal.add(atendimento.getDataFinalDDMMYYYYHHMMSS());
+					//listaFinal.add(atendimento.getDataFinalDDMMYYYYHHMMSS());
 					listaFinal.add(atendimento.getTempoDecorrido().toString());
 					listaFinal.add(atendimento.definirFaixaDeHoras().descricao);
 					listaFinal.add(atendimento.getTipoAtendimento());
 					listaFinal.add(atendimento.getLotacaoAtendenteDestino() != null ? 
 							atendimento.getLotacaoAtendenteDestino().getSiglaCompleta() : "");
-					//listaFinal.add(atendimento.getClassificacao());
+					listaFinal.add(atendimento.getClassificacao());
 					listaFinal.add(sol.isFechado() ? "Sim" : "Nao" );
 				}
 			}

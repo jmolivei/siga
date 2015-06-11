@@ -3,6 +3,7 @@ package models;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpLotacao;
 
 
@@ -124,7 +125,8 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	public enum SrFaixa {		
 		ATE_1(1, "Ate 1 horas"), ATE_2(2, "Ate 2 horas"), ATE_4(3, "Ate 4 horas"), 
 		ATE_8(4, "Ate 8 horas"), ATE_12(5, "Ate 12 horas"),ATE_16(6, "Ate 16 horas"), 
-		ATE_24(7, "Ate 24 horas"), ACIMA_24(8, "Acima de 24 horas");
+		ATE_24(7, "Ate 24 horas"), ACIMA_24(8, "Acima de 24 horas"), ATE_15MIN(9, "Ate 15 minutos"),
+		ATE_3(10, "Ate 3 horas"), ATE_15(11, "Ate 15 horas"), ACIMA_15(12, "Acima de 15 horas");
 		
 		public int idFaixa;
 		public String descricao;
@@ -135,8 +137,33 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		}
 	}
 	
+	//public SrFaixa definirFaixaDeHoras(CpOrgaoUsuario orgao) {
 	public SrFaixa definirFaixaDeHoras() {
-		float horas = tempoDecorrido.getValorEmHora();
+	float horas = tempoDecorrido.getValorEmHora();
+		//if (orgao.getAcronimoOrgaoUsu().equals("JFRJ"))
+		if ("TRF".equals("JFRJ"))
+		//if ("JFRJ".equals("JFRJ"))	
+			return definirFaixaJFRJ(horas);
+		else
+			return definirFaixaTRF(horas);
+	}
+	
+	private SrFaixa definirFaixaTRF(float horas) {
+		if (horas <= 0.25)
+			return SrFaixa.ATE_15MIN;
+		else if (horas > 0.25 && horas <= 1)
+			return SrFaixa.ATE_1;
+		else if (horas > 1 && horas <= 3)
+			return SrFaixa.ATE_3;
+		else if (horas > 3 && horas <= 8)
+			return SrFaixa.ATE_8;
+		else if (horas > 8 && horas <= 15)
+			return SrFaixa.ATE_15;
+		else
+			return SrFaixa.ACIMA_15;
+	}
+	
+	private SrFaixa definirFaixaJFRJ(float horas) {
 		if (horas <= 1)
 			return SrFaixa.ATE_1;
 		else if (horas > 1 && horas <= 2)
@@ -154,7 +181,6 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		else
 			return SrFaixa.ACIMA_24;
 	}
-	
 	@Override
 	public int compareTo(SrAtendimento o) {
 		if (this != null && o != null) {
