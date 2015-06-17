@@ -69,6 +69,12 @@ import notifiers.Correio;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Days;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -719,6 +725,15 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	public Set<SrMovimentacao> getMovimentacaoSetOrdemCrescente() {
 		return getMovimentacaoSet(false, null, true, false, false, false);
 	}
+	
+	public Set<SrMovimentacao> getMovimentacaoSetCalculoAtendimento(boolean todoOContexto) {
+		List<Long> tiposPrincipais = Arrays.asList(TIPO_MOVIMENTACAO_ESCALONAMENTO,
+				TIPO_MOVIMENTACAO_FECHAMENTO, TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO, 
+				TIPO_MOVIMENTACAO_REABERTURA);
+		
+		return getMovimentacaoSet(false, null, false, todoOContexto, false, false, tiposPrincipais);
+		
+	}
 
 	public Set<SrMovimentacao> getMovimentacaoSet(boolean considerarCanceladas,
 			Long tipoMov, boolean ordemCrescente, boolean todoOContexto,
@@ -914,6 +929,16 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		return listaCompleta;
 	}
 
+	public SrSolicitacao  getUltimaSolFilhaFechadaOuCancelada() {
+		for (SrMovimentacao mov: getMovimentacaoSetComCanceladosTodoOContexto()) {
+			if (mov.solicitacao.isFilha() && 
+					(mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_FECHAMENTO 
+						|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_CANCELAMENTO_DE_SOLICITACAO))
+			return mov.solicitacao;
+		}
+		return null;
+	}
+	
 	public boolean isPai() {
 		return getSolicitacaoFilhaSet() != null
 				&& getSolicitacaoFilhaSet().size() > 0;

@@ -45,6 +45,7 @@ import models.SrUrgencia;
 import models.vo.PaginaItemConfiguracao;
 import models.vo.SelecionavelVO;
 import models.vo.SrSolicitacaoListaVO;
+import net.sf.jasperreports.engine.JRParameter;
 
 import org.joda.time.LocalDate;
 
@@ -57,6 +58,7 @@ import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
 import play.mvc.Scope;
+import reports.SrRelDadosBase;
 import util.AtualizacaoLista;
 import util.SrSolicitacaoAtendidos;
 import util.SrSolicitacaoFiltro;
