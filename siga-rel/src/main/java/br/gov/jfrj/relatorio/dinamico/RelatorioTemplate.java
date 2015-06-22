@@ -196,7 +196,7 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 
 		relatorio = configurarRelatorio();
 		dados = processarDados();
-		if (dados!=null && dados.size() > 0) {
+		if (dados != null && dados.size() > 0) {
 			relatorio.setDados(dados);
 		} else {
 			throw new Exception("Não há dados para gerar o relatório!");
@@ -230,7 +230,7 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 	 * @return Retorna um builder de relatórios.
 	 * @throws DJBuilderException
 	 * @throws JRException
-	 * @throws ColumnBuilderException 
+	 * @throws ColumnBuilderException
 	 */
 	public abstract AbstractRelatorioBaseBuilder configurarRelatorio()
 			throws DJBuilderException, JRException, ColumnBuilderException;
@@ -289,19 +289,29 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 		htmlExp.exportReport();
 		return sb;
 	}
-	
+
 	public void getRelatorioExcel(String pathDestino) throws JRException {
 		JExcelApiExporter excelExp = new JExcelApiExporter();
-		excelExp.setParameter(JRExporterParameter.JASPER_PRINT,relatorio.getRelatorioJasperPrint());
+		excelExp.setParameter(JRExporterParameter.JASPER_PRINT,
+				relatorio.getRelatorioJasperPrint());
 		excelExp.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, pathDestino);
-		excelExp.setParameter(JExcelApiExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_COLLAPSE_ROW_SPAN, Boolean.TRUE); 
-		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, Boolean.TRUE); 
-		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE); 
-		excelExp.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE); 
-		excelExp.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE); 
-		//excelExp.setParameter(JExcelApiExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE); 
-		excelExp.exportReport();	
+		excelExp.setParameter(
+				JExcelApiExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_COLLAPSE_ROW_SPAN,
+				Boolean.TRUE);
+		excelExp.setParameter(
+				JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS,
+				Boolean.TRUE);
+		excelExp.setParameter(
+				JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS,
+				Boolean.TRUE);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET,
+				Boolean.FALSE);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE,
+				Boolean.TRUE);
+		// excelExp.setParameter(JExcelApiExporterParameter.IS_WHITE_PAGE_BACKGROUND,
+		// Boolean.FALSE);
+		excelExp.exportReport();
 	}
 
 }

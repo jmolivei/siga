@@ -1683,20 +1683,25 @@ public class Application extends SigaApplication {
 		configuracao.salvar();
 		return configuracao.toVO().toJson();
 	}
-	
-	public static void gerarDadosRelatorio() throws Exception {
-		//assertAcesso("REL:Relatorio");
 
+	public static void exibirRelAtendimentos() throws Exception {
+		//assertAcesso("REL:Relatorio");
+		render();
+	}
+	
+	public static void gerarRelAtendimentos(Long lotacao, String dtIni, String dtFim) throws Exception {
+		//assertAcesso("REL:Relatorio");
+		DpLotacao lotaAtendente = JPA.em().find(DpLotacao.class, lotacao);
 		Map<String, Object> parametros = new HashMap<String, Object>();
-		parametros.put("dtIni", "01/04/2015");
-		parametros.put("dtFim", "30/04/2015");
-		parametros.put("atendente", "STI-HDK");
+		parametros.put("dtIni", dtIni);
+		parametros.put("dtFim", dtFim);
+		parametros.put("idlotaAtendenteIni", lotaAtendente.getIdLotacaoIni());
+		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getDescricaoMaiusculas());
 		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
-		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");
-		
+		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");	
 	}
 
 }
