@@ -11,6 +11,9 @@ GET     /favicon.ico                        404
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                            staticDir:public
 
+*		/relatorio/atendimentos				Application.exibirRelAtendimentos
+*		/relatorio/atendimentos/gerar		Application.gerarRelAtendimentos
+
 *		/designacao/gravar					Application.gravarDesignacao
 *		/designacao/listar					Application.listarDesignacao
 

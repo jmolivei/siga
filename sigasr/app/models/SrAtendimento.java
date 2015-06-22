@@ -137,12 +137,9 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		}
 	}
 	
-	//public SrFaixa definirFaixaDeHoras(CpOrgaoUsuario orgao) {
-	public SrFaixa definirFaixaDeHoras() {
-	float horas = tempoDecorrido.getValorEmHora();
-		//if (orgao.getAcronimoOrgaoUsu().equals("JFRJ"))
-		if ("TRF".equals("JFRJ"))
-		//if ("JFRJ".equals("JFRJ"))	
+	public SrFaixa definirFaixaDeHoras(CpOrgaoUsuario orgao) {
+		float horas = tempoDecorrido.getValorEmHora();
+		if (orgao.getAcronimoOrgaoUsu().equals("JFRJ"))	
 			return definirFaixaJFRJ(horas);
 		else
 			return definirFaixaTRF(horas);
@@ -184,13 +181,14 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	@Override
 	public int compareTo(SrAtendimento o) {
 		if (this != null && o != null) {
-			if (this.getSolicitacao().codigo.equals(o.getSolicitacao().codigo))
+			return this.getTempoDecorrido().compareTo(o.getTempoDecorrido());
+			/*if (this.getSolicitacao().codigo.equals(o.getSolicitacao().codigo))
 				if (this.getDataInicio().equals(o.getDataInicio()))
 					return this.getDataFinal().compareTo(o.getDataFinal());
 				else 
 					return this.getDataInicio().compareTo(o.getDataInicio());
 			else
-				return this.getSolicitacao().idSolicitacao.compareTo(o.getSolicitacao().idSolicitacao);
+				return this.getSolicitacao().idSolicitacao.compareTo(o.getSolicitacao().idSolicitacao);*/
 		}
 		return 0;
 	}

@@ -132,5 +132,13 @@
 			</build>
 		</profile>
 	</profiles>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>jasperreports</groupId>
+				<artifactId>jasperreports</artifactId>
+				<version>3.5.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

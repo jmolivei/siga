@@ -4,7 +4,9 @@
 	<deployment>
 	   <module-alias name="sigasr" />		
 		<dependencies>
+		<!-- 
 			<module name="sigadoc.rel" export="true" />
+		-->
 			<module name="org.picketlink" />
 			<module name="asm.asm" />
 			<module name="org.hibernate"/>

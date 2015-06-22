@@ -1,0 +1,39 @@
+#{extends 'main.html' /}
+
+	<div class="gt-bd clearfix">
+	<div class="gt-content clearfix">
+		<div class="gt-content-box gt-for-table" style="margin-top: 15px;">
+		#{form @Application.gerarRelAtendimentos(),
+			enctype:'multipart/form-data',id:'formRelAtendimento',onsubmit:'javascript:return block();' }
+		<!-- <form id="grelTransferencias" action="@{Application.gerarRelAtendimentos}" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="secaoUsuario" value="${lotaTitular.orgaoUsuario.descricaoMaiusculas}" />
+		jQuery.unblockUI();
+		-->
+		
+			<table class="gt-form-table">
+				<tbody>
+					<tr class="header">
+						<td align="center" valign="top" colspan="4">Dados do Relatório de Atendimentos</td>
+					</tr>
+					<tr>
+						<td>Lotação Atendente</td>
+						<td> #{selecao tipo:'lotacao',nome:'lotacao', value:lotacao /}</td>	
+					</tr>
+					<tr>
+						<td>Data inicial e final</td>
+						<td>
+							#{dataCalendar nome:'dtIni', value:dtIni /} a
+							#{dataCalendar nome:'dtFim', value:dtFim /}
+						</td>
+					</tr>
+					<tr>
+							<td colspan="2"><input type="submit"
+								class="gt-btn-medium gt-btn-left" value="Gerar"></td>
+					</tr>
+					</tbody>
+				</table>
+		#{/form}
+		</div>
+	</div>
+	</div>
+	
