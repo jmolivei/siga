@@ -105,7 +105,7 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			query.setParameter("idLotaAtendenteIni", idlotaAtendenteIni);
 	
 			List<SrSolicitacao> lista = query.getResultList();
-			for (SrSolicitacao sol : lista) {
+			/*for (SrSolicitacao sol : lista) {
 				if (sol.isCancelado())
 					continue;
 				if (sol.isPai())
@@ -133,6 +133,31 @@ public class SrRelDadosBase extends RelatorioTemplate {
 				listaFinal.add(atendimento.getTempoDecorrido().toString());
 				listaFinal.add(atendimento.getFaixa().descricao);
 				//listaFinal.add();
+			}*/
+			for (SrSolicitacao sol : lista) {
+				if (sol.isCancelado())
+					continue;
+				if (sol.isPai())
+					listaAtendimento = sol.getAtendimentosSolicitacaoPai();
+				else 
+					listaAtendimento = sol.getAtendimentos(false);	
+				for (SrAtendimento a : listaAtendimento) {
+					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni)) {
+						listaFinal.add(a.getSolicitacao().codigo);
+						listaFinal.add(a.getSolicitacao().getDtRegDDMMYYYYHHMM());
+						listaFinal.add(a.getLotacaoAtendente().getSiglaCompleta());
+						//listaFinal.add(atendimento.getDataInicio());
+						listaFinal.add(a.getDataInicioDDMMYYYYHHMMSS());
+						listaFinal.add(a.getDataFinalDDMMYYYYHHMMSS());
+						listaFinal.add(a.getTipoAtendimento());
+						listaFinal.add(a.getLotacaoAtendenteDestino() != null ? 
+								a.getLotacaoAtendenteDestino().getSiglaCompleta() : "");
+						listaFinal.add(a.getClassificacao());
+						listaFinal.add(a.getSolicitacao().isFechado() ? "Sim" : "Nao" );
+						listaFinal.add(a.getTempoDecorrido().toString());
+						listaFinal.add(a.getFaixa().descricao);
+					}
+				}
 			}
 		}
 		catch (Exception e) {
