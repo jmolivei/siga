@@ -53,6 +53,7 @@ import play.Play;
 import play.data.validation.Error;
 import play.data.validation.Validation;
 import play.db.jpa.JPA;
+import play.db.jpa.NoTransaction;
 import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
@@ -1689,6 +1690,7 @@ public class Application extends SigaApplication {
 		render();
 	}
 	
+	@NoTransaction
 	public static void gerarRelAtendimentos(Long lotacao, String dtIni, String dtFim) throws Exception {
 		//assertAcesso("REL:Relatorio");
 		DpLotacao lotaAtendente = JPA.em().find(DpLotacao.class, lotacao);
@@ -1696,7 +1698,7 @@ public class Application extends SigaApplication {
 		parametros.put("dtIni", dtIni);
 		parametros.put("dtFim", dtFim);
 		parametros.put("idlotaAtendenteIni", lotaAtendente.getIdLotacaoIni());
-		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getDescricaoMaiusculas());
+		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getAcronimoOrgaoUsu());
 		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
