@@ -1,18 +1,12 @@
 package reports;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,12 +14,8 @@ import java.util.TreeSet;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
-import models.SrAcao;
 import models.SrAtendimento;
-import models.SrItemConfiguracao;
 import models.SrSolicitacao;
-
-
 import play.db.jpa.JPA;
 import ar.com.fdvs.dj.domain.builders.ColumnBuilderException;
 import ar.com.fdvs.dj.domain.builders.DJBuilderException;
@@ -33,10 +23,6 @@ import br.gov.jfrj.relatorio.dinamico.AbstractRelatorioBaseBuilder;
 import br.gov.jfrj.relatorio.dinamico.RelatorioRapido;
 import br.gov.jfrj.relatorio.dinamico.RelatorioTemplate;
 import br.gov.jfrj.siga.base.AplicacaoException;
-import br.gov.jfrj.siga.base.Texto;
-import br.gov.jfrj.siga.cp.CpComplexo;
-import br.gov.jfrj.siga.dp.DpLotacao;
-import br.gov.jfrj.siga.dp.DpSubstituicao;
 
 public class SrRelDadosBase extends RelatorioTemplate {
 
@@ -59,19 +45,20 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			throws DJBuilderException, ColumnBuilderException {
 		
 		this.setTitle("Relatorio de Atendimentos");
-		this.addColuna("Solicitacao", 30, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Data de Abertura", 25, RelatorioRapido.CENTRO, false);
-		this.addColuna("Atendente", 20, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Data de Inicio Atendimento", 25, RelatorioRapido.CENTRO, false);
-		//this.addColuna("Data de Inicio Atendimento", 25, RelatorioRapido.CENTRO, false, Date.class);
-		this.addColuna("Data de Fim Atendimento", 25, RelatorioRapido.CENTRO, false);
-		this.addColuna("Tipo de Atendimento", 30, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Proximo Atendente", 20, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Classificacao", 70, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Solicitacao", 25, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Data de Abertura", 17, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Equipe Atendente", 15, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Pessoa Atendente", 15, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Data de Inicio Atendimento", 20, RelatorioRapido.CENTRO, false);
+		this.addColuna("Data de Fim Atendimento", 20, RelatorioRapido.CENTRO, false);
+		this.addColuna("Tipo de Atendimento", 25, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Proximo Atendente", 15, RelatorioRapido.ESQUERDA, false);
+		//this.addColuna("Classificacao", 65, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Classificacao", 50, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Solicitacao Fechada?", 15, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Tempo de Atendimento", 40, RelatorioRapido.DIREITA, false);
-		this.addColuna("Faixa", 20, RelatorioRapido.ESQUERDA, false);
-		//this.addColuna("Totalizador", 15, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Tempo de Atendimento", 26, RelatorioRapido.DIREITA, false);
+		this.addColuna("Faixa", 18, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Totalizador (%)", 14, RelatorioRapido.DIREITA, false, Number.class);
 		
 		return this;
 	}
@@ -83,20 +70,33 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		Set<SrAtendimento> listaAtendimento = null;
 		Set<SrAtendimento> listaAtendimentoTotal = new TreeSet<SrAtendimento>();
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+		int quantRegistros = 1; int tamanhoLista = 0;
 		
 		try {
-			//movimentacao de inicio de atendimento (tipo = 1), fechamento (tipo = 7), escalonamento (tipo = 24)  
-			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol where sol.idSolicitacao in ("
-					+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
-					+ "where (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni " 
-					+ "and s.dtReg >= :dataIni and s.dtReg <= :dataFim group by s.idSolicitacao) "
-					+ "order by sol.dtReg");
-		
-			//Query query = JPA.em().createQuery("select s from SrSolicitacao s where s.codigo = 'TRF2-SR-2015/05356'");						
-			//('TRF2-SR-2015/05228', 'TRF2-SR-2015/05755', JFRJ-SR-2015/00318"
-			//		+ "'TRF2-SR-2015/05290', 'TRF2-SR-2015/05282', 'TRF2-SR-2015/05356', 'TRF2-SR-2015/05780') order by s.dtReg"); */
-			//TRF2-SR-2015/05356, TRF2-SR-2015/05755, TRF2-SR-2015/05290, TRF2-SR-2015/05282, TRF2-SR-2015/05228, TRF2-SR-2015/05780
-					
+			//movimentacao de inicio de atendimento (tipo = 1), fechamento (tipo = 7), escalonamento (tipo = 24)  	
+/*			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol "
+					+ "where sol.idSolicitacao in ("
+						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
+						+ "where s.dtReg between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
+						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
+					+ "order by sol.dtReg");*/
+			
+/*			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol inner join sol.meuMarcaSet marca "
+					+ "where marca.cpMarcador.idMarcador <> 45 and sol.idSolicitacao in ("
+						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
+						+ "where s.dtReg between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
+						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
+					+ "order by sol.dtReg");*/
+			
+			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol inner join sol.meuMarcaSet marca "
+					+ "where marca.cpMarcador.idMarcador <> 45 and sol.idSolicitacao in ("
+						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
+						+ "where s.hisDtIni between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
+						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
+					+ "order by sol.hisDtIni");
+			
+			
+			//and s.codigo like 'TRF2-SR-2015/07844' 
 			Date dtIni = formatter.parse((String) parametros.get("dtIni") + " 00:00:00");
 			query.setParameter("dataIni", dtIni, TemporalType.TIMESTAMP);
 			Date dtFim = formatter.parse((String) parametros.get("dtFim") + " 23:59:59");
@@ -105,24 +105,28 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			query.setParameter("idLotaAtendenteIni", idlotaAtendenteIni);
 	
 			List<SrSolicitacao> lista = query.getResultList();
-			/*for (SrSolicitacao sol : lista) {
-				if (sol.isCancelado())
-					continue;
+			for (SrSolicitacao sol : lista) {
+/*				if (sol.isCancelado())
+					continue;*/
 				if (sol.isPai())
 					listaAtendimento = sol.getAtendimentosSolicitacaoPai();
 				else 
 					listaAtendimento = sol.getAtendimentos(false);	
 				for (SrAtendimento a : listaAtendimento) {
-					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni)) {
+					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni) &&
+							a.getTempoAtendimento() != null) {
 						listaAtendimentoTotal.add(a);
 					}
 				}
 			}
+			tamanhoLista = listaAtendimentoTotal.size();
 			for (SrAtendimento atendimento : listaAtendimentoTotal) {
 				listaFinal.add(atendimento.getSolicitacao().codigo);
-				listaFinal.add(atendimento.getSolicitacao().getDtRegDDMMYYYYHHMM());
+				//listaFinal.add(atendimento.getSolicitacao().getDtRegDDMMYYYYHHMM());
+				listaFinal.add(atendimento.getSolicitacao().getHisDtIniDDMMYYYYHHMM());
 				listaFinal.add(atendimento.getLotacaoAtendente().getSiglaCompleta());
-				//listaFinal.add(atendimento.getDataInicio());
+				listaFinal.add(atendimento.getPessoaAtendente() != null ? 
+						atendimento.getPessoaAtendente().getPrimeiroNomeEIniciais() : "");
 				listaFinal.add(atendimento.getDataInicioDDMMYYYYHHMMSS());
 				listaFinal.add(atendimento.getDataFinalDDMMYYYYHHMMSS());
 				listaFinal.add(atendimento.getTipoAtendimento());
@@ -130,39 +134,16 @@ public class SrRelDadosBase extends RelatorioTemplate {
 						atendimento.getLotacaoAtendenteDestino().getSiglaCompleta() : "");
 				listaFinal.add(atendimento.getClassificacao());
 				listaFinal.add(atendimento.getSolicitacao().isFechado() ? "Sim" : "Nao" );
-				listaFinal.add(atendimento.getTempoDecorrido().toString());
+				listaFinal.add(atendimento.getTempoAtendimento().toString());
 				listaFinal.add(atendimento.getFaixa().descricao);
-				//listaFinal.add();
-			}*/
-			for (SrSolicitacao sol : lista) {
-				if (sol.isCancelado())
-					continue;
-				if (sol.isPai())
-					listaAtendimento = sol.getAtendimentosSolicitacaoPai();
-				else 
-					listaAtendimento = sol.getAtendimentos(false);	
-				for (SrAtendimento a : listaAtendimento) {
-					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni)) {
-						listaFinal.add(a.getSolicitacao().codigo);
-						listaFinal.add(a.getSolicitacao().getDtRegDDMMYYYYHHMM());
-						listaFinal.add(a.getLotacaoAtendente().getSiglaCompleta());
-						//listaFinal.add(atendimento.getDataInicio());
-						listaFinal.add(a.getDataInicioDDMMYYYYHHMMSS());
-						listaFinal.add(a.getDataFinalDDMMYYYYHHMMSS());
-						listaFinal.add(a.getTipoAtendimento());
-						listaFinal.add(a.getLotacaoAtendenteDestino() != null ? 
-								a.getLotacaoAtendenteDestino().getSiglaCompleta() : "");
-						listaFinal.add(a.getClassificacao());
-						listaFinal.add(a.getSolicitacao().isFechado() ? "Sim" : "Nao" );
-						listaFinal.add(a.getTempoDecorrido().toString());
-						listaFinal.add(a.getFaixa().descricao);
-					}
-				}
+				listaFinal.add(Float.parseFloat(String.format(Locale.US,"%.2f", 
+						(quantRegistros * 100f)/tamanhoLista)));
+				quantRegistros++;
 			}
 		}
 		catch (Exception e) {
-			throw new Exception(e.getMessage());
-			//throw new AplicacaoException("Erro ao gerar o relatorio de atendimentos"); 
+			//throw new Exception(e.getMessage());
+			throw new AplicacaoException("Erro ao gerar o relatorio de atendimentos"); 
 		}
 		return listaFinal;
 	}

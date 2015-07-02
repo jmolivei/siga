@@ -1,15 +1,15 @@
 #{extends 'main.html' /}
-
+<script type="text/javascript">
+		$(document).ready(function(){			
+			$(".gt-success").delay(12000).fadeOut("slow", "linear");
+		});
+</script>
 	<div class="gt-bd clearfix">
 	<div class="gt-content clearfix">
 		<div class="gt-content-box gt-for-table" style="margin-top: 15px;">
+		#{if flash.success} <p class="gt-success">${flash.success}</p> #{/if}
 		#{form @Application.gerarRelAtendimentos(),
-			enctype:'multipart/form-data',id:'formRelAtendimento',onsubmit:'javascript:return block();' }
-		<!-- <form id="grelTransferencias" action="@{Application.gerarRelAtendimentos}" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="secaoUsuario" value="${lotaTitular.orgaoUsuario.descricaoMaiusculas}" />
-		jQuery.unblockUI();
-		-->
-		
+			enctype:'multipart/form-data',id:'formRelAtendimento',onsubmit:'javascript:jQuery.blockUI(objBlock);' }		
 			<table class="gt-form-table">
 				<tbody>
 					<tr class="header">
@@ -22,9 +22,13 @@
 					<tr>
 						<td>Data inicial e final</td>
 						<td>
-							#{dataCalendar nome:'dtIni', value:dtIni /} a
-							#{dataCalendar nome:'dtFim', value:dtFim /}
+							<input type="text" name="dtIni" value="" onblur="javascript:verifica_data(this,true)"  /> a
+							<input type="text" name="dtFim" value="" onblur="javascript:verifica_data(this,true)"  />
 						</td>
+					</tr>
+					<tr>
+						<td>Informe o local para salvar o relatório</td>
+						<td><input type="text" name="path" value="" style="width: 500px;"/> </td>
 					</tr>
 					<tr>
 							<td colspan="2"><input type="submit"

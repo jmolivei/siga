@@ -38,11 +38,11 @@ public class SrArquivo extends GenericModel {
 	@Column(name = "DESCRICAO")
 	public String descricao;
 
-	private SrArquivo() {
+	public SrArquivo() {
 
 	}
 
-	private SrArquivo(File file) {
+	public SrArquivo(File file) {
 		try {
 
 			nomeArquivo = file.getName();
@@ -58,11 +58,11 @@ public class SrArquivo extends GenericModel {
 	// que o SrArquivo não seja instanciado a não ser que realmente tenha sido
 	// selecionado um arquivo no form (para que não surja um registro SrArquivo
 	// sem conteúdo no banco)
-	public static SrArquivo newInstance(File file) {
+/*	public static SrArquivo newInstance(File file) {
 		if (file != null)
 			return new SrArquivo(file);
 		else
 			return null;
-	}
+	}*/
 
 }

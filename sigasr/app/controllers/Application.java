@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.ByteArrayInputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import play.data.validation.Error;
 import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.db.jpa.NoTransaction;
+import play.db.jpa.Transactional;
 import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
@@ -1690,10 +1692,13 @@ public class Application extends SigaApplication {
 		render();
 	}
 	
-	@NoTransaction
-	public static void gerarRelAtendimentos(Long lotacao, String dtIni, String dtFim) throws Exception {
+	@Transactional(readOnly=true)
+	public static void gerarRelAtendimentos(Long lotacao, String dtIni, 
+			String dtFim, String path) throws Exception {
 		//assertAcesso("REL:Relatorio");
 		DpLotacao lotaAtendente = JPA.em().find(DpLotacao.class, lotacao);
+		String nomeArquivoExportado = "relAtendimentos-" 
+					+  new SimpleDateFormat("ddMMyyyy-HHmm").format(new Date());
 		Map<String, Object> parametros = new HashMap<String, Object>();
 		parametros.put("dtIni", dtIni);
 		parametros.put("dtFim", dtFim);
@@ -1703,7 +1708,9 @@ public class Application extends SigaApplication {
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
-		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");	
+		rel.getRelatorioExcel(path + "\\" + nomeArquivoExportado + ".xls");	
+		flash.success("Relatorio " + nomeArquivoExportado + " exportado para " + path + " com sucesso!");
+		exibirRelAtendimentos();
 	}
 
 }

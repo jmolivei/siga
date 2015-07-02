@@ -56,52 +56,53 @@ public class SrMovimentacao extends GenericModel {
 	@Column(name = "DT_INI_MOV")
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date dtIniMov;
-
-	@ManyToOne(cascade = CascadeType.ALL)
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	//@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_ARQUIVO")
 	public SrArquivo arquivo;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ATENDENTE")
 	public DpPessoa atendente;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_ATENDENTE")
 	public DpLotacao lotaAtendente;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_DESIGNACAO")
 	public SrConfiguracao designacao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_CADASTRANTE")
 	public DpPessoa cadastrante;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_CADASTRANTE")
 	public DpLotacao lotaCadastrante;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_TITULAR")
 	public DpPessoa titular;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_TITULAR")
 	public DpLotacao lotaTitular;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITACAO")
 	public SrSolicitacao solicitacao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LISTA")
 	public SrLista lista;
 
-	@ManyToOne(optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "ID_MOV_CANCELADORA")
 	public SrMovimentacao movCanceladora;
 
-	@ManyToOne(optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "ID_TIPO_MOVIMENTACAO")
 	public SrTipoMovimentacao tipoMov;
 
@@ -115,11 +116,11 @@ public class SrMovimentacao extends GenericModel {
 	@JoinColumn(name = "ID_PESQUISA")
 	public SrPesquisa pesquisa;
 
-	@OneToMany(targetEntity = SrResposta.class, mappedBy = "movimentacao", fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
+	@OneToMany(targetEntity = SrResposta.class, mappedBy = "movimentacao", cascade=CascadeType.PERSIST)
 	// @OrderBy("pergunta asc")
 	protected List<SrResposta> respostaSet;
 	
-	@OneToMany(targetEntity = SrMovimentacao.class, mappedBy = "movFinalizadora", fetch=FetchType.LAZY)
+	@OneToMany(targetEntity = SrMovimentacao.class, mappedBy = "movFinalizadora")
 	protected List<SrMovimentacao> movFinalizadaSet;
 
 	@Column(name = "DT_AGENDAMENTO")
@@ -129,19 +130,19 @@ public class SrMovimentacao extends GenericModel {
 	@Enumerated
 	public SrTipoMotivoPendencia motivoPendencia;
 
-	@ManyToOne(optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "ID_MOV_FINALIZADORA")
 	public SrMovimentacao movFinalizadora;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITACAO_REFERENCIA")
 	public SrSolicitacao solicitacaoReferencia;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO")
 	public SrItemConfiguracao itemConfiguracao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ACAO")
 	public SrAcao acao;
 	
@@ -265,7 +266,7 @@ public class SrMovimentacao extends GenericModel {
 	}
 
 	public void setArquivo(File file) {
-		this.arquivo = SrArquivo.newInstance(file);
+		this.arquivo = new SrArquivo(file);//SrArquivo.newInstance(file);
 	}
 	
 	public SrMovimentacao salvar(DpPessoa cadastrante, DpLotacao lotaCadastrante, 

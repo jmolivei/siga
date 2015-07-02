@@ -295,12 +295,12 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 		excelExp.setParameter(JRExporterParameter.JASPER_PRINT,
 				relatorio.getRelatorioJasperPrint());
 		excelExp.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, pathDestino);
-		excelExp.setParameter(
-				JExcelApiExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET,
-				Boolean.FALSE);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE,
-				Boolean.TRUE);
+		excelExp.setParameter(JExcelApiExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
+		excelExp.setParameter(JExcelApiExporterParameter.IGNORE_PAGE_MARGINS, true);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, true);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, true);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET, false);
+		excelExp.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE, true);
 		excelExp.exportReport();
 	}
 

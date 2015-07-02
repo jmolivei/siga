@@ -51,22 +51,22 @@ public class SrConfiguracao extends CpConfiguracao {
 	@Transient
 	public SrItemConfiguracao itemConfiguracaoFiltro;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name="SR_CONFIGURACAO_ITEM", schema = "SIGASR", joinColumns={@JoinColumn(name="ID_CONFIGURACAO")}, inverseJoinColumns={@JoinColumn(name="ID_ITEM_CONFIGURACAO")})
 	public List<SrItemConfiguracao> itemConfiguracaoSet;
 	
 	@Transient
 	public SrAcao acaoFiltro;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name="SR_CONFIGURACAO_ACAO", schema = "SIGASR", joinColumns={@JoinColumn(name="ID_CONFIGURACAO")}, inverseJoinColumns={@JoinColumn(name="ID_ACAO")})
 	public List<SrAcao> acoesSet;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ATENDENTE")
 	public DpLotacao atendente;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_TIPO_ATRIBUTO")
 	public SrAtributo atributo;
 
@@ -74,7 +74,7 @@ public class SrConfiguracao extends CpConfiguracao {
 	@JoinColumn(name = "ID_PESQUISA")
 	public SrPesquisa pesquisaSatisfacao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LISTA")
 	public SrLista listaPrioridade;
 	
@@ -85,7 +85,7 @@ public class SrConfiguracao extends CpConfiguracao {
 	@Enumerated
 	public SrPrioridade prioridadeNaLista;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name="SR_CONFIGURACAO_PERMISSAO", joinColumns = @JoinColumn(name = "ID_CONFIGURACAO"), inverseJoinColumns = @JoinColumn(name = "TIPO_PERMISSAO"), schema="SIGASR")
 	public List<SrTipoPermissaoLista> tipoPermissaoSet;
 	
