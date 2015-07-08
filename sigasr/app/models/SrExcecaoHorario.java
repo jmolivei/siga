@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -34,7 +35,7 @@ public class SrExcecaoHorario extends Objeto{
 	@Column(name = "ID_EXCECAO_HORARIO", nullable = false)
 	public Long idExcecaoHorario;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="ID_EQUIPE", nullable = false)
 	public SrEquipe equipe;
 	

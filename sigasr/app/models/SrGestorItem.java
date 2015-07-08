@@ -41,7 +41,7 @@ public class SrGestorItem extends Objeto{
 	@NaoRecursivo
 	private DpLotacao dpLotacao;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO")
 	public SrItemConfiguracao itemConfiguracao;
 	

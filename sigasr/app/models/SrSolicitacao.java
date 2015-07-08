@@ -1704,8 +1704,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		filha.solicitacaoInicial = null;
 		filha.meuMovimentacaoSet = null;
 		filha.dtIniEdicao = new Date();
-		//incluir
-		//filha.dtReg = new Date();
+		filha.dtReg = new Date();
 		filha.meuMovimentacaoReferenciaSet = null;
 		for (SrSolicitacao s : getSolicitacaoFilhaSet())
 			filha.numSequencia = s.numSequencia;
@@ -3006,6 +3005,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		SrValor tempoAtendimentoLiquido = null;
 		Long tempoAtendimentoParcial = 0L;
 		Long tempoAtendimentoBruto, tempoADescontarTotal = 0L;
+		
 		
 		if (listaTrechosDeAtendimentos.size() > 0) {
 			for (Interval intervaloAtendimento : listaTrechosDeAtendimentos) {

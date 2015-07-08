@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -30,18 +31,18 @@ public class SrPergunta extends HistoricoSuporte {
 	@Column(name = "DESCR_PERGUNTA")
 	public String descrPergunta;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_PESQUISA")
 	public SrPesquisa pesquisa;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_TIPO_PERGUNTA")
 	public SrTipoPergunta tipoPergunta;
 
 	@Column(name = "ORDEM_PERGUNTA")
 	public Long ordemPergunta;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrPergunta perguntaInicial;
 

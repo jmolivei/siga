@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -38,11 +39,11 @@ public class SrPrioridadeSolicitacao extends Objeto {
 	@Column(name = "ID_PRIORIDADE_SOLICITACAO")
 	public Long idPrioridadeSolicitacao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LISTA")
 	public SrLista lista;	
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="ID_SOLICITACAO")
 	public SrSolicitacao solicitacao;	
 

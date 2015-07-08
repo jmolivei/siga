@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -29,11 +30,11 @@ public class SrConfiguracaoIgnorada extends Objeto {
 	@Column(name = "ID_CONFIGURACAO_IGNORADA")	
 	public Long idConfiguracaoIgnorada;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO", nullable = false)
 	public SrItemConfiguracao itemConfiguracao;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_CONFIGURACAO", nullable = false)
 	public SrConfiguracao configuracao;
 	

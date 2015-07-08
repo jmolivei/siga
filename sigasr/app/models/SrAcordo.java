@@ -47,7 +47,7 @@ public class SrAcordo extends HistoricoSuporte implements Selecionavel {
 	@Column(name = "DESCR_ACORDO")
 	public String descrAcordo;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrAcordo acordoInicial;
 

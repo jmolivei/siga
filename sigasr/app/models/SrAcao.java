@@ -54,11 +54,11 @@ public class SrAcao extends HistoricoSuporte implements SrSelecionavel, Comparab
 	@Column(name = "TITULO_ACAO")
 	public String tituloAcao;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrAcao acaoInicial;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "TIPO_ACAO")
 	public SrTipoAcao tipoAcao;
 
@@ -66,7 +66,7 @@ public class SrAcao extends HistoricoSuporte implements SrSelecionavel, Comparab
 	@OrderBy("hisDtIni desc")
 	public List<SrAcao> meuAcaoHistoricoSet;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_PAI")
 	public SrAcao pai;
 

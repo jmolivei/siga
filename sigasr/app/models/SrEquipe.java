@@ -40,7 +40,7 @@ public class SrEquipe extends HistoricoSuporte {
 	@Column(name = "ID_EQUIPE")
 	public Long idEquipe;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_EQUIPE")
 	public DpLotacao lotacao;
 	

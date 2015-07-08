@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -34,7 +35,7 @@ public class SrAtributoAcordo extends HistoricoSuporte {
 	@Column(name = "ID_ATRIBUTO_ACORDO")
 	public Long idAtributoAcordo;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ACORDO")
 	public SrAcordo acordo;
 
@@ -44,15 +45,15 @@ public class SrAtributoAcordo extends HistoricoSuporte {
 	@Column(name = "VALOR")
 	public Long valor;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "UNIDADE_MEDIDA")
 	public CpUnidadeMedida unidadeMedida;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ATRIBUTO")
 	public SrAtributo atributo;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrAtributoAcordo atributoAcordoInicial;
 

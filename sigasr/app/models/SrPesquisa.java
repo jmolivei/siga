@@ -47,7 +47,7 @@ public class SrPesquisa extends HistoricoSuporte {
 	@Column(name = "DESCR_PESQUISA")
 	public String descrPesquisa;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrPesquisa pesquisaInicial;
 

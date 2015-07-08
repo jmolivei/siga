@@ -56,7 +56,7 @@ public class SrAtributo extends HistoricoSuporte {
 	@Enumerated
 	public SrTipoAtributo tipoAtributo;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "ID_OBJETIVO")
 	public SrObjetivoAtributo objetivoAtributo;
 
@@ -66,7 +66,7 @@ public class SrAtributo extends HistoricoSuporte {
 	@Column(name = "CODIGO_ATRIBUTO")
 	public String codigoAtributo;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrAtributo atributoInicial;
 
