@@ -58,33 +58,7 @@
                     <groupId>de.jollyday</groupId>
                     <artifactId>jollyday</artifactId>
                     <version>0.4.7</version>
-                  </dependency>
-                                    
-                  <dependency>
-                      <groupId>ar.com.fdvs</groupId>
-                      <artifactId>DynamicJasper</artifactId>
-                      <version>3.0.6</version>
-                      <exclusions>
-                        <exclusion>
-                          <groupId>bouncycastle</groupId>
-                          <artifactId>bcmail-jdk14</artifactId>
-                        </exclusion>
-                        <exclusion>
-                          <groupId>bouncycastle</groupId>
-                          <artifactId>bcprov-jdk14</artifactId>
-                        </exclusion>
-                        <exclusion>
-                          <groupId>xml-apis</groupId>
-                          <artifactId>xml-apis</artifactId>
-                        </exclusion>
-                        <exclusion>
-                          <groupId>eclipse</groupId>
-                          <artifactId>jdtcore</artifactId>
-                        </exclusion>
-
-                      </exclusions>
-                  </dependency>
-            
+                  </dependency>  
             
                   <dependency>
                     <groupId>org.jboss.javaee</groupId>
@@ -432,13 +406,13 @@
 			</build>
 		</profile>
 	</profiles>
-	<dependencyManagement>
+<!-- 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>jasperreports</groupId>
+ 			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
 				<artifactId>jasperreports</artifactId>
-				<version>3.5.1</version>
+				<version>5.2.0</version>
 			</dependency>
 		</dependencies>
-	</dependencyManagement>
+	</dependencyManagement> -->
 </project>

@@ -28,7 +28,10 @@ public class SrRelDadosBase extends RelatorioTemplate {
 
 	public SrRelDadosBase(Map parametros) throws DJBuilderException {
 		super(parametros);
-		/*if (parametros.get("dtIni").equals("")) {
+		if (parametros.get("idlotaAtendenteIni") == null) {
+			throw new DJBuilderException("Parâmetro Lotação não informado!");
+		}
+		if (parametros.get("dtIni").equals("")) {
 			throw new DJBuilderException(
 					"Parâmetro data inicial não informado!");
 		}
@@ -36,9 +39,6 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			throw new DJBuilderException(
 					"Parâmetro data final não informado!");
 		}
-		if (parametros.get("local") == null) {
-			throw new DJBuilderException("Parâmetro local não informado!");
-		}*/
 }
 
 	public AbstractRelatorioBaseBuilder configurarRelatorio()
@@ -46,14 +46,13 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		
 		this.setTitle("Relatorio de Atendimentos");
 		this.addColuna("Solicitacao", 25, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Data de Abertura", 17, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Data de Abertura", 20, RelatorioRapido.CENTRO, false);
 		this.addColuna("Equipe Atendente", 15, RelatorioRapido.ESQUERDA, false);
-		this.addColuna("Pessoa Atendente", 15, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Pessoa Atendente", 18, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Data de Inicio Atendimento", 20, RelatorioRapido.CENTRO, false);
 		this.addColuna("Data de Fim Atendimento", 20, RelatorioRapido.CENTRO, false);
 		this.addColuna("Tipo de Atendimento", 25, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Proximo Atendente", 15, RelatorioRapido.ESQUERDA, false);
-		//this.addColuna("Classificacao", 65, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Classificacao", 50, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Solicitacao Fechada?", 15, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Tempo de Atendimento", 26, RelatorioRapido.DIREITA, false);
@@ -73,30 +72,14 @@ public class SrRelDadosBase extends RelatorioTemplate {
 		int quantRegistros = 1; int tamanhoLista = 0;
 		
 		try {
-			//movimentacao de inicio de atendimento (tipo = 1), fechamento (tipo = 7), escalonamento (tipo = 24)  	
-/*			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol "
-					+ "where sol.idSolicitacao in ("
-						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
-						+ "where s.dtReg between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
-						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
-					+ "order by sol.dtReg");*/
-			
-/*			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol inner join sol.meuMarcaSet marca "
-					+ "where marca.cpMarcador.idMarcador <> 45 and sol.idSolicitacao in ("
-						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
-						+ "where s.dtReg between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
-						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
-					+ "order by sol.dtReg");*/
-			
+			//movimentacao de inicio de atendimento (tipo = 1), fechamento (tipo = 7), escalonamento (tipo = 24)  			
 			Query query = JPA.em().createQuery("select sol from SrSolicitacao sol inner join sol.meuMarcaSet marca "
 					+ "where marca.cpMarcador.idMarcador <> 45 and sol.idSolicitacao in ("
 						+ "select s.idSolicitacao from SrSolicitacao s inner join s.meuMovimentacaoSet mov "
 						+ "where s.hisDtIni between :dataIni and :dataFim and (mov.tipoMov = 1 or mov.tipoMov = 7 or mov.tipoMov = 24) "
 						+ "and mov.lotaAtendente.idLotacaoIni = :idLotaAtendenteIni group by s.idSolicitacao) "
 					+ "order by sol.hisDtIni");
-			
-			
-			//and s.codigo like 'TRF2-SR-2015/07844' 
+
 			Date dtIni = formatter.parse((String) parametros.get("dtIni") + " 00:00:00");
 			query.setParameter("dataIni", dtIni, TemporalType.TIMESTAMP);
 			Date dtFim = formatter.parse((String) parametros.get("dtFim") + " 23:59:59");
@@ -106,8 +89,6 @@ public class SrRelDadosBase extends RelatorioTemplate {
 	
 			List<SrSolicitacao> lista = query.getResultList();
 			for (SrSolicitacao sol : lista) {
-/*				if (sol.isCancelado())
-					continue;*/
 				if (sol.isPai())
 					listaAtendimento = sol.getAtendimentosSolicitacaoPai();
 				else 
@@ -122,7 +103,6 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			tamanhoLista = listaAtendimentoTotal.size();
 			for (SrAtendimento atendimento : listaAtendimentoTotal) {
 				listaFinal.add(atendimento.getSolicitacao().codigo);
-				//listaFinal.add(atendimento.getSolicitacao().getDtRegDDMMYYYYHHMM());
 				listaFinal.add(atendimento.getSolicitacao().getHisDtIniDDMMYYYYHHMM());
 				listaFinal.add(atendimento.getLotacaoAtendente().getSiglaCompleta());
 				listaFinal.add(atendimento.getPessoaAtendente() != null ? 
@@ -142,7 +122,6 @@ public class SrRelDadosBase extends RelatorioTemplate {
 			}
 		}
 		catch (Exception e) {
-			//throw new Exception(e.getMessage());
 			throw new AplicacaoException("Erro ao gerar o relatorio de atendimentos"); 
 		}
 		return listaFinal;

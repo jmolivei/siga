@@ -89,7 +89,8 @@ public abstract class AbstractRelatorioBaseBuilder extends DynamicReportBuilder 
 		estiloTituloColuna = new Style();
 		estiloTituloColuna.setName("estiloTituloColuna");
 		estiloTituloColuna.setFont(Font.ARIAL_MEDIUM_BOLD);
-		estiloTituloColuna.setBorderBottom(Border.PEN_1_POINT);
+		//estiloTituloColuna.setBorderBottom(Border.PEN_1_POINT);
+		estiloTituloColuna.setBorderBottom(Border.PEN_1_POINT());
 		estiloTituloColuna.setBackgroundColor(Color.gray);
 		estiloTituloColuna.setTextColor(Color.white);
 		estiloTituloColuna.setHorizontalAlign(HorizontalAlign.CENTER);
@@ -101,13 +102,15 @@ public abstract class AbstractRelatorioBaseBuilder extends DynamicReportBuilder 
 		estiloColuna.setName("estiloColuna");
 		estiloColuna.setFont(Font.ARIAL_SMALL);
 		estiloColuna.setTextColor(Color.BLACK);
-		estiloColuna.setBorder(Border.THIN);
+		//estiloColuna.setBorder(Border.THIN);
+		estiloColuna.setBorder(Border.THIN());
 		this.addStyle(estiloColuna);
 		
 		estiloTituloGrupo = new Style();
 		estiloTituloGrupo.setName("estiloTituloGrupo");
 		estiloTituloGrupo.setFont(new Font(12,"Arial",true));
-		estiloTituloGrupo.setBorderTop(Border.THIN);
+		//estiloTituloGrupo.setBorderTop(Border.THIN);
+		estiloTituloGrupo.setBorderTop(Border.THIN());
 		estiloTituloGrupo.setBackgroundColor(Color.white);
 		estiloTituloGrupo.setTextColor(Color.black);
 		estiloTituloGrupo.setHorizontalAlign(HorizontalAlign.LEFT);
@@ -158,7 +161,7 @@ public abstract class AbstractRelatorioBaseBuilder extends DynamicReportBuilder 
 	 * 
 	 * @throws Exception
 	 */
-	public void setDadosColecaoMap(Collection<Map<String,String>> dados) throws Exception{
+	public void setDadosColecaoMap(Collection<Map<String,?>> dados) throws Exception{
 		ds = new JRMapCollectionDataSource(dados);	
 	}
 	

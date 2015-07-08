@@ -30,18 +30,27 @@
             <version>1.0.1.Final</version>
             <scope>provided</scope>
         </dependency>
-                
-      <dependency>
-          <groupId>ar.com.fdvs</groupId>
-          <artifactId>DynamicJasper</artifactId>
-          <version>3.0.6</version>
-      </dependency>
-                
+      	<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>5.2.0</version>
+			<exclusions>
+              <exclusion>
+              	<groupId>eclipse</groupId>
+               	<artifactId>*</artifactId>
+              </exclusion>
+              <exclusion>
+               	<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+              </exclusion>
+        	</exclusions>
+		</dependency>               
     </dependencies>
 
 
 <build>
     <sourceDirectory>app</sourceDirectory>
+
 
   <plugins>
 

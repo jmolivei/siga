@@ -1,6 +1,10 @@
 package controllers;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.HttpCookie;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
 import javax.persistence.Query;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +52,8 @@ import models.vo.SelecionavelVO;
 import models.vo.SrSolicitacaoListaVO;
 import net.sf.jasperreports.engine.JRParameter;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.hibernate.ejb.criteria.expression.BinaryArithmeticOperation;
 import org.joda.time.LocalDate;
 
 import play.Logger;
@@ -56,6 +63,8 @@ import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.db.jpa.NoTransaction;
 import play.db.jpa.Transactional;
+import play.libs.Files;
+import play.mvc.After;
 import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
@@ -76,6 +85,8 @@ import br.gov.jfrj.siga.model.Objeto;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Application extends SigaApplication {
 
@@ -1688,29 +1699,31 @@ public class Application extends SigaApplication {
 	}
 
 	public static void exibirRelAtendimentos() throws Exception {
-		//assertAcesso("REL:Relatorio");
+		assertAcesso("REL:Relatorio");
 		render();
 	}
 	
 	@Transactional(readOnly=true)
 	public static void gerarRelAtendimentos(Long lotacao, String dtIni, 
-			String dtFim, String path) throws Exception {
-		//assertAcesso("REL:Relatorio");
+			String dtFim, String downloadToken) throws Exception {
+		assertAcesso("REL:Relatorio");
 		DpLotacao lotaAtendente = JPA.em().find(DpLotacao.class, lotacao);
-		String nomeArquivoExportado = "relAtendimentos-" 
-					+  new SimpleDateFormat("ddMMyyyy-HHmm").format(new Date());
+		String nomeArquivoExportado = "relAtendimentos_" 
+					+  new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date()) 
+					+ "_" + lotaAtendente.getSigla() + ".xlsx";
 		Map<String, Object> parametros = new HashMap<String, Object>();
 		parametros.put("dtIni", dtIni);
 		parametros.put("dtFim", dtFim);
 		parametros.put("idlotaAtendenteIni", lotaAtendente.getIdLotacaoIni());
-		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getAcronimoOrgaoUsu());
-		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getDescricaoMaiusculas());
+		parametros.put(JRParameter.IS_IGNORE_PAGINATION, true);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
-		rel.getRelatorioExcel(path + "\\" + nomeArquivoExportado + ".xls");	
-		flash.success("Relatorio " + nomeArquivoExportado + " exportado para " + path + " com sucesso!");
-		exibirRelAtendimentos();
+		byte[] arquivo = rel.getRelatorioExcel();
+		
+		response.setCookie("fileDownloadToken", downloadToken);
+		renderBinary(new ByteArrayInputStream(arquivo), nomeArquivoExportado,  
+				arquivo.length, false);
 	}
-
 }

@@ -18,7 +18,9 @@
  ******************************************************************************/
 package br.gov.jfrj.relatorio.dinamico;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,8 @@ import net.sf.jasperreports.engine.export.JExcelApiExporter;
 import net.sf.jasperreports.engine.export.JExcelApiExporterParameter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import ar.com.fdvs.dj.domain.builders.ColumnBuilderException;
 import ar.com.fdvs.dj.domain.builders.DJBuilderException;
 
@@ -289,19 +293,25 @@ public abstract class RelatorioTemplate extends RelatorioRapido {
 		htmlExp.exportReport();
 		return sb;
 	}
-
-	public void getRelatorioExcel(String pathDestino) throws JRException {
-		JExcelApiExporter excelExp = new JExcelApiExporter();
+	
+	public byte[]  getRelatorioExcel() throws JRException, IOException {
+		ByteArrayOutputStream xlsReport = new ByteArrayOutputStream();
+		JRXlsxExporter excelExp = new JRXlsxExporter();
 		excelExp.setParameter(JRExporterParameter.JASPER_PRINT,
 				relatorio.getRelatorioJasperPrint());
-		excelExp.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, pathDestino);
-		excelExp.setParameter(JExcelApiExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
-		excelExp.setParameter(JExcelApiExporterParameter.IGNORE_PAGE_MARGINS, true);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, true);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, true);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET, false);
-		excelExp.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE, true);
+		
+		excelExp.setParameter(JRExporterParameter.OUTPUT_STREAM, xlsReport);
+		excelExp.setParameter(JRXlsExporterParameter.MAXIMUM_ROWS_PER_SHEET, 0);
+		excelExp.setParameter(JRXlsExporterParameter.IGNORE_PAGE_MARGINS, true);
+		excelExp.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, true);
+		excelExp.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, true);
+		excelExp.setParameter(JRXlsExporterParameter.IS_IMAGE_BORDER_FIX_ENABLED, true);
+		excelExp.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET, false);
+		excelExp.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, true);
+		
 		excelExp.exportReport();
+		byte[] arquivo = xlsReport.toByteArray();
+		xlsReport.close();
+		return arquivo;
 	}
-
 }
