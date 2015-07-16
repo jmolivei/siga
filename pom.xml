@@ -234,10 +234,10 @@
 						<groupId>eclipse</groupId>
 						<artifactId>jdtcore</artifactId>
 					</exclusion>
-					<exclusion>
-						<groupId>jasperreports</groupId>
+<!-- 					<exclusion>
+						<groupId>net.sf.jasperreports</groupId>
 						<artifactId>jasperreports</artifactId>
-					</exclusion>
+					</exclusion> -->
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -341,6 +341,12 @@
 				<artifactId>commons-beanutils</artifactId>
 				<version>1.9.2</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>3.2.1</version>
+			</dependency>
 
 			<dependency>
 				<groupId>javax.mail</groupId>
@@ -383,9 +389,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>jasperreports</groupId>
+				<groupId>net.sf.jasperreports</groupId>
 				<artifactId>jasperreports</artifactId>
-				<version>3.5.1</version>
+				<version>5.2.0</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.bouncycastle</groupId>
@@ -395,23 +401,29 @@
 						<groupId>org.bouncycastle</groupId>
 						<artifactId>bcprov-jdk14</artifactId>
 					</exclusion>
+	              	<exclusion>
+		              	<groupId>eclipse</groupId>
+		               	<artifactId>*</artifactId>
+		            </exclusion>
+            		<exclusion>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
-			<dependency>
-				<groupId>net.sf.jasperreports</groupId>
-				<artifactId>jasperreports</artifactId>
-				<version>5.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sourceforge.jexcelapi</groupId>
-				<artifactId>jxl</artifactId>
-				<version>2.6</version>
-			</dependency>
+
 			<dependency>
 				<groupId>ar.com.fdvs</groupId>
 				<artifactId>DynamicJasper</artifactId>
-				<version>3.0.6</version>
+				<version>5.0.0</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.12</version>
+			</dependency>
+			
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache</artifactId>
