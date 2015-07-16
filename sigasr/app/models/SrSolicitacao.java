@@ -112,35 +112,35 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Column(name = "ID_SOLICITACAO")
 	public Long idSolicitacao;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITANTE")
 	public DpPessoa solicitante;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_INTERLOCUTOR")
 	public DpPessoa interlocutor;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_SOLICITANTE")
 	public DpLotacao lotaSolicitante;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_CADASTRANTE")
 	public DpPessoa cadastrante;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_CADASTRANTE")
 	public DpLotacao lotaCadastrante;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_TITULAR")
 	public DpPessoa titular;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_TITULAR")
 	public DpLotacao lotaTitular;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_DESIGNACAO")
 	public SrConfiguracao designacao;
 
@@ -150,11 +150,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Transient
 	private Cronometro cron;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ORGAO_USU")
 	public CpOrgaoUsuario orgaoUsuario;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITACAO_PAI")
 	public SrSolicitacao solicitacaoPai;
 
@@ -168,15 +168,15 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Enumerated
 	public SrMeioComunicacao meioComunicacao;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO")
 	public SrItemConfiguracao itemConfiguracao;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_ARQUIVO")
 	public SrArquivo arquivo;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ACAO")
 	public SrAcao acao;
 
@@ -208,7 +208,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date dtOrigem;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_COMPLEXO")
 	public CpComplexo local;
 
@@ -230,7 +230,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Column(name = "DESCR_CODIGO")
 	public String codigo;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrSolicitacao solicitacaoInicial;
 
@@ -560,7 +560,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 
 	// Edson: Necess�rio porque nao h� binder para arquivo
 	public void setArquivo(File file) {
-		this.arquivo = SrArquivo.newInstance(file);
+		this.arquivo = new SrArquivo(file);//SrArquivo.newInstance(file);
 	}
 
 	public int getGUT() {
@@ -619,6 +619,14 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		if (dtReg != null) {
 			final SimpleDateFormat df = new SimpleDateFormat("HH:mm");
 			return df.format(dtReg);
+		}
+		return "";
+	}
+	
+	public String getHisDtIniDDMMYYYYHHMM() {
+		if (getHisDtIni() != null) {
+			final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+			return df.format(getHisDtIni());
 		}
 		return "";
 	}
@@ -932,9 +940,9 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 
 	public SrSolicitacao  getUltimaSolFilhaFechadaOuCancelada() {
 		for (SrMovimentacao mov: getMovimentacaoSetComCanceladosTodoOContexto()) {
-			if (mov.solicitacao.isFilha() && 
-					(mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_FECHAMENTO 
-						|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_CANCELAMENTO_DE_SOLICITACAO))
+			if (mov.solicitacao.isFilha() 
+					&& (mov.solicitacao.getDtEfetivoFechamento() !=  null
+						|| mov.solicitacao.getDtCancelamento() != null))
 			return mov.solicitacao;
 		}
 		return null;
@@ -1703,6 +1711,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		filha.solicitacaoInicial = null;
 		filha.meuMovimentacaoSet = null;
 		filha.dtIniEdicao = new Date();
+		filha.dtReg = new Date();
 		filha.meuMovimentacaoReferenciaSet = null;
 		for (SrSolicitacao s : getSolicitacaoFilhaSet())
 			filha.numSequencia = s.numSequencia;
@@ -2639,8 +2648,8 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	}
 
 	// Edson: retorna o tempo decorrido entre duas datas, descontando
-	// os per�odos de pend�ncia (blocos).
-	// PPP, abaixo, � o bloco pendente. I � dtIni e F � dtFim
+	// os periodos de pendencia (blocos).
+	// PPP, abaixo, eh o bloco pendente. I eh dtIni e F eh dtFim
 	public SrValor getTempoDecorrido(Date dtIni, Date dtFim) {
 		Map<Date, Date> pendencias = getTrechosPendentes();
 		Long decorrido = 0L;
@@ -2840,42 +2849,51 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		Set<SrMovimentacao> listaMov = getMovimentacaoSetCalculoAtendimento(todoOContexto);
 		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
 		SrAtendimento atendimento = null;
-		if (!isFechado()) {
-			atendimento = new SrAtendimento();
-			atendimento.setDataFinal(new Date());
-			atendimento.setClassificacao(this.acao.toString());
-		}
-		for (SrMovimentacao mov : listaMov) {	
-			//marca inicio de atendimento
-			if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO
-					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO
-					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_REABERTURA) {
-				atendimento.setDataInicio(mov.dtIniMov);
-				atendimento.setTempoDecorrido(getTempoAtendimentoReal(atendimento.getDataInicio(),
-						atendimento.getDataFinal()));
-				atendimento.setLotacaoAtendente(mov.lotaAtendente);
-				atendimento.setSolicitacao(this);
-				atendimento.setFaixa(atendimento.definirFaixaDeHoras(mov.lotaAtendente.getOrgaoUsuario()));
-								
-				listaAtendimentos.add(atendimento);
-			}	
-			//marca fim de atendimento
-			if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_FECHAMENTO 
-					|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
+		
+		try {
+			if (!isFechado()) {
 				atendimento = new SrAtendimento();
-				atendimento.setDataFinal(mov.dtIniMov);
-				atendimento.setTipoAtendimento(mov.tipoMov.nome);
-				if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
-					atendimento.setLotacaoAtendenteDestino(mov.lotaAtendente);
-					//atendimento.setClassificacao(mov.itemConfiguracao.toString() + ", " + 
-					//		mov.acao.toString());
-					atendimento.setClassificacao(mov.acao.toString());
-				}
-				else
-					//atendimento.setClassificacao(getItemAtual().toString() + ", " + 
-					//		getAcaoAtual().toString());
-					atendimento.setClassificacao(getAcaoAtual().toString());
+				atendimento.setDataFinal(new Date());
+				atendimento.setPessoaAtendente(getAtendente());
+				atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
+				atendimento.setAcao(this.acao.toString());
 			}
+			for (SrMovimentacao mov : listaMov) {	
+				//marca inicio de atendimento
+				if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO
+						|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO
+						|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_REABERTURA) {
+					atendimento.setDataInicio(mov.dtIniMov);
+					atendimento.setTempoAtendimento(getTempoAtendimentoReal(atendimento.getDataInicio(),
+							atendimento.getDataFinal()));
+					atendimento.setLotacaoAtendente(mov.lotaAtendente);
+					atendimento.setSolicitacao(this);
+					atendimento.setFaixa(atendimento.definirFaixaDeHoras(mov.lotaAtendente.getOrgaoUsuario()));
+									
+					listaAtendimentos.add(atendimento);
+				}	
+				//marca fim de atendimento
+				if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_FECHAMENTO 
+						|| mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
+					atendimento = new SrAtendimento();
+					atendimento.setDataFinal(mov.dtIniMov);
+					atendimento.setTipoAtendimento(mov.tipoMov.nome);
+					if (mov.tipoMov.idTipoMov == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
+						atendimento.setLotacaoAtendenteDestino(mov.lotaAtendente);
+						atendimento.setPessoaAtendente(mov.titular);
+						atendimento.setItemConfiguracao(mov.itemConfiguracao.toString());
+						atendimento.setAcao(mov.acao.toString());
+					}
+					else {
+						atendimento.setPessoaAtendente(mov.atendente);
+						atendimento.setItemConfiguracao(getItemAtual().toString());
+						atendimento.setAcao(getAcaoAtual().toString());
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 		return listaAtendimentos;
 	}
@@ -2884,19 +2902,19 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
 		Set<SrMovimentacao> listaMov = getMovimentacaoSetCalculoAtendimento(true);
 		SrSolicitacao ultimaFilha = getUltimaSolFilhaFechadaOuCancelada();
+		DpLotacao lotacaoAtendente = getLotaAtendente();
+		DpPessoa pessoaAtendente = getAtendente();
 		SrAtendimento atendimento = null;
 		Date dataFinalPai, dataFinalFilha = null; 
 		Date dtFinal = null; Date dtInicio = null;
 		DpLotacao lotacaoDestino = null;
-		DpLotacao lotacaoAtendente = getLotaAtendente();
 		String classificacao = null;
 		
 		try {
 			if (ultimaFilha != null)		
 				dataFinalFilha = ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento()
 						: ultimaFilha.getDtEfetivoFechamento();
-			if ((isAFechar() || isFechado()) && this.idSolicitacao != 22925 && this.idSolicitacao != 22984) {
-					//&& this.idSolicitacao != 21956) {
+			if ((isAFechar() || isFechado())) {
 				if (isFechado()) {
 					dataFinalPai = getDtEfetivoFechamento();
 					classificacao = "Fechamento";
@@ -2907,10 +2925,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				}
 				atendimento = new SrAtendimento(this, dataFinalFilha, dataFinalPai, 
 						getTempoAtendimentoReal(dataFinalFilha, dataFinalPai), lotacaoAtendente, 
-						classificacao);
+						pessoaAtendente, classificacao);
 				atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
 				atendimento.setLotacaoAtendenteDestino(null);
-				atendimento.setClassificacao(getAcaoAtual().toString());
+				atendimento.setItemConfiguracao(getItemAtual().toString());
+				atendimento.setAcao(getAcaoAtual().toString());
 				listaAtendimentos.add(atendimento);
 			}
 			//incluir a REABERTURA
@@ -2920,27 +2939,28 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 					if (dataFinalFilha != null && mov.dtIniMov.compareTo(dataFinalFilha) == 1) {
 						atendimento = new SrAtendimento(this, dataFinalFilha, mov.dtIniMov,
 								getTempoAtendimentoReal(dataFinalFilha, mov.dtIniMov), lotacaoAtendente,
-								"Escalonamento com sol. filha");
+								mov.titular, "Escalonamento com sol. filha");
 						atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
 						atendimento.setLotacaoAtendenteDestino(mov.lotaAtendente);
-						//atendimento.setClassificacao(ultimaFilha.acao.toString());
-						atendimento.setClassificacao(this.acao.toString());
+						atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
+						atendimento.setAcao(this.acao.toString());
 						listaAtendimentos.add(atendimento);
 					}
 					else { 
 						if (mov.solicitacao.isFilha()) {
 							dtFinal = mov.solicitacao.getDtInicioAtendimento();
 							lotacaoDestino = mov.lotaAtendente;
-							//classificacao = mov.solicitacao.acao.toString();
+							pessoaAtendente = mov.titular;
 						}
 						if (mov.solicitacao.equals(this)) {
 							dtInicio = getDtInicioAtendimento();
 							atendimento = new SrAtendimento(this, dtInicio, dtFinal, 
 									getTempoAtendimentoReal(dtInicio, dtFinal), lotacaoAtendente,
-									"Escalonamento com sol. filha");
+									pessoaAtendente, "Escalonamento com sol. filha");
 							atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
 							atendimento.setLotacaoAtendenteDestino(lotacaoDestino);
-							atendimento.setClassificacao(this.acao.toString());
+							atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
+							atendimento.setAcao(this.acao.toString());
 							listaAtendimentos.add(atendimento);
 						}
 					}
@@ -2953,86 +2973,129 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		return listaAtendimentos;
 	}
 	
-	public SrValor getTempoAtendimentoReal(Date dataInicio, Date dataFinal) {	
-		DateTime inicio = new DateTime(dataInicio);
-		DateTime fim = new DateTime(dataFinal);
+	// nao foi possivel usar os metodos after e before para comparar as datas, pois
+	// para datas em que a diferenca sao poucos milisegundos a resposta eh errada
+	public List<Interval> getTrechosSemPendencia(Date dtIni, Date dtFim) {
+		Map<Date, Date> pendencias = getTrechosPendentes();
+		List<Interval> listaDeIntervalos = new ArrayList<Interval>();
+		Interval intervaloSemPendencia = null;
+		for (Date dtIniBlocoPendencia : pendencias.keySet()) {
+			Date dtFimBlocoPendencia = pendencias.get(dtIniBlocoPendencia);
+			// ----------I----------F---PPPP---
+			if (dtIniBlocoPendencia.getTime() > (dtFim.getTime()))
+				break;	
+			// -------PPPIPPPPPPPPPPPPFP------- ou 
+			// -------PPPIPPPPPPPPPPFPPP...---- 
+			if ((dtFimBlocoPendencia == null || dtFimBlocoPendencia.getTime() > (dtFim.getTime()))
+					&& dtIniBlocoPendencia.getTime() < (dtIni.getTime()))
+				return listaDeIntervalos;
+			// ---PPPP---I----------F----------
+			if (dtFimBlocoPendencia != null && dtFimBlocoPendencia.getTime() < (dtIni.getTime()))
+				continue;
+			// ----------I---PPPP---F----------
+			if (dtIniBlocoPendencia.getTime() > (dtIni.getTime())) {
+
+				intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtIniBlocoPendencia));
+				listaDeIntervalos.add(intervaloSemPendencia);
+			}
+			dtIni = dtFimBlocoPendencia;
+		}
+		if (dtIni != null && !(dtIni.getTime() > dtFim.getTime())) {
+			intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtFim));
+			listaDeIntervalos.add(intervaloSemPendencia);
+		}
+		return listaDeIntervalos;
+	}
+	
+	public SrValor getTempoAtendimentoReal(Date dataInicio, Date dataFinal) {
+		List<Interval> listaTrechosDeAtendimentos = getTrechosSemPendencia(dataInicio, dataFinal);
+		Interval intervaloDeTrabalho = null;
+		SrValor tempoAtendimentoLiquido = null;
+		Long tempoAtendimentoParcial = 0L;
+		Long tempoAtendimentoBruto, tempoADescontarTotal = 0L;
+		
+		
+		if (listaTrechosDeAtendimentos.size() > 0) {
+			for (Interval intervaloAtendimento : listaTrechosDeAtendimentos) {
+				intervaloDeTrabalho = getIntervaloDeTempo(8, 20, intervaloAtendimento.getStart());
+				if (intervaloDeTrabalho.contains(intervaloAtendimento) 
+						|| (!intervaloAtendimento.getStart().isBefore(intervaloDeTrabalho.getStart())
+								&& intervaloAtendimento.getStart().toLocalDate().equals(intervaloAtendimento.getEnd().toLocalDate()))) {
+					tempoAtendimentoParcial += Seconds.secondsBetween(intervaloAtendimento.getStart(), 
+							intervaloAtendimento.getEnd()).getSeconds(); 
+				}
+				else
+					tempoADescontarTotal += getTempoSemEfetivoAtendimento(intervaloAtendimento, intervaloDeTrabalho);
+			}
+			// quando alterar o metodo getTempoSemEfetivoAtendimento para getTempoEfetivoAtendimento
+			// essa condicao nao sera mais necessaria
+			if (tempoADescontarTotal > 0)
+				tempoAtendimentoBruto = (long) Seconds.secondsBetween(new DateTime(dataInicio), new DateTime(dataFinal))
+													.getSeconds(); 
+			else
+				tempoAtendimentoBruto = tempoAtendimentoParcial;
+			tempoAtendimentoLiquido = new SrValor(tempoAtendimentoBruto - tempoADescontarTotal, 
+					CpUnidadeMedida.SEGUNDO);
+			return tempoAtendimentoLiquido;
+		}
+		return tempoAtendimentoLiquido;	
+	}
+	
+	public Long getTempoSemEfetivoAtendimento(Interval intervaloAtendimento, Interval intervaloDeTrabalho) {	
+		DateTime inicio = intervaloAtendimento.getStart();
+		DateTime fim = intervaloAtendimento.getEnd();
 		Seconds tempoExtra = null; Seconds tempoExtraParcial = null;
-		Interval intervaloDeTrabalho = null; Interval intervaloEfetivoAtendimento = null;
-		SrValor tempoADescontar, tempoDecorrido = null;
+		Long tempoADescontar = null;
 		int diasNaoUteis = 0; 
 		
 		try {
-			intervaloDeTrabalho = getIntervaloDeTempo(8, 20, dataInicio);
 			if (inicio.isAfter(fim))
 				System.out.println(("SOLICITACAO: " + this.codigo + ", id: " + this.idSolicitacao));
-			intervaloEfetivoAtendimento = new Interval(inicio, fim);
-			if (intervaloDeTrabalho.contains(intervaloEfetivoAtendimento))
-				return getTempoDecorrido(dataInicio, dataFinal);
-			else {
-				//tratando o "inicio do atendimento"
-				if (isDiaUtil(inicio)) {
+			//tratando o "inicio do atendimento"
+			if (isDiaUtil(inicio)) {
+				if (inicio.isAfter(intervaloDeTrabalho.getEnd()))
+					tempoExtra = Seconds.secondsBetween(inicio, 
+							new LocalDate(inicio).toDateTime(new LocalTime(23, 59, 59)));
+				else {
 					if (inicio.isBefore(intervaloDeTrabalho.getStart()))
 						tempoExtra = Seconds.secondsBetween(inicio, intervaloDeTrabalho.getStart());
-					else if (inicio.isAfter(intervaloDeTrabalho.getEnd()))
-						tempoExtra = Seconds.secondsBetween(inicio, 
-								new LocalDate(dataInicio).toDateTime(new LocalTime(23, 59, 59)));
-					else if (inicio.getDayOfMonth() != fim.getDayOfMonth())
+					if (!inicio.toLocalDate().equals(fim.toLocalDate()))
 						tempoExtra = Seconds.secondsBetween(intervaloDeTrabalho.getEnd(), 
-								new LocalDate(dataInicio).toDateTime(new LocalTime(23, 59, 59)));
+								new LocalDate(inicio).toDateTime(new LocalTime(23, 59, 59)));
 				}
-				//descontando o horario antes do inicio oficial de trabalho ao "final do atendimento"
-				if (inicio.getDayOfMonth() != fim.getDayOfMonth()) {
-					intervaloDeTrabalho = getIntervaloDeTempo(8, 20, dataFinal);
-					tempoExtra = (Seconds.secondsBetween(new LocalDate(dataFinal).toDateTime(LocalTime.MIDNIGHT),
-							intervaloDeTrabalho.getStart()).plus(tempoExtra));
-					// tratando o primeiro dia
-			/*		if (isDiaUtil(inicio)) {
-						if (intervaloDeTrabalho.contains(inicio))
-							tempoExtra = Seconds.secondsBetween(intervaloDeTrabalho.getEnd(), 
-									new LocalDate(dataInicio).toDateTime(new LocalTime(23, 59, 59)));
-						else
-							tempoExtra = Seconds.secondsBetween(inicio, 
-									new LocalDate(dataInicio).toDateTime(new LocalTime(23, 59, 59)));
-					}*/
-					//tratando o ultimo dia
-			/*		if (isDiaUtil(fim))
-						intervaloDeTrabalho = getIntervaloDeTempo(8, 20, dataFinal);
-						if (intervaloDeTrabalho.contains(fim))
-							tempoExtra = (Seconds.secondsBetween(new LocalDate(dataFinal).toDateTime(LocalTime.MIDNIGHT),
-									intervaloDeTrabalho.getStart()).plus(tempoExtra));
-							else
-								tempoExtra = (Seconds.secondsBetween(new LocalDate(dataFinal).toDateTime(LocalTime.MIDNIGHT),
-										fim).plus(tempoExtra));	
-						*/
-					//tratando so dias entre o primeiro e o ultimo dias
-					DateTime diaDepoisInicio = inicio.plusDays(1);
-					while (diaDepoisInicio.toLocalDate().isBefore(fim.toLocalDate())) {
-						//dia nao util
-						if (!isDiaUtil(diaDepoisInicio))
-							diasNaoUteis++;
-						else
-							tempoExtraParcial = (Days.ONE.toStandardSeconds()
-								.minus(Seconds.secondsIn(getIntervaloDeTempo(8, 20, diaDepoisInicio.toDate())))
-								.plus(tempoExtraParcial)); 					
-						diaDepoisInicio = diaDepoisInicio.plusDays(1);
-					}
-				}
-				if (tempoExtra != null) {
-					if (tempoExtraParcial != null)
-						tempoExtra = tempoExtra.plus(tempoExtraParcial);
-				} else
-					tempoExtra = Seconds.ZERO;
-				
-				tempoADescontar = new SrValor((diasNaoUteis * (long) Days.ONE.toStandardSeconds().getSeconds()) 
-						+ tempoExtra.getSeconds(), CpUnidadeMedida.SEGUNDO);
-				tempoDecorrido = getTempoDecorrido(dataInicio, dataFinal);
-				tempoDecorrido.setValor(tempoDecorrido.getValor() - tempoADescontar.getValor());
 			}
+			//descontando o horario antes do inicio oficial de trabalho ao "final do atendimento"
+			if (!inicio.toLocalDate().equals(fim.toLocalDate())) {
+				intervaloDeTrabalho = getIntervaloDeTempo(8, 20, fim);
+				tempoExtra = (Seconds.secondsBetween(new LocalDate(fim).toDateTime(LocalTime.MIDNIGHT),
+						intervaloDeTrabalho.getStart()).plus(tempoExtra));
+				//tratando so dias entre o primeiro e o ultimo dias
+				DateTime diaDepoisInicio = inicio.plusDays(1);
+				while (diaDepoisInicio.toLocalDate().isBefore(fim.toLocalDate())) {
+					//dia nao util
+					if (!isDiaUtil(diaDepoisInicio))
+						diasNaoUteis++;
+					else
+						tempoExtraParcial = (Days.ONE.toStandardSeconds()
+							.minus(Seconds.secondsIn(getIntervaloDeTempo(8, 20, diaDepoisInicio)))
+							.plus(tempoExtraParcial)); 					
+					diaDepoisInicio = diaDepoisInicio.plusDays(1);
+				}
+			}
+			if (tempoExtra != null) {
+				if (tempoExtraParcial != null)
+					tempoExtra = tempoExtra.plus(tempoExtraParcial);
+			} 
+			else
+				tempoExtra = Seconds.ZERO;	
+			
+			tempoADescontar = (diasNaoUteis * (long) Days.ONE.toStandardSeconds().getSeconds()) 
+					+ tempoExtra.getSeconds();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		return tempoDecorrido;
+		return tempoADescontar;
 	}
 	
 	public boolean isDiaUtil(DateTime data) {
@@ -3040,7 +3103,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				&& data.getDayOfWeek() != DateTimeConstants.SUNDAY);
 	}
 	
-	public Interval getIntervaloDeTempo(int horaInicio, int horaFim, Date dia) {
+	public Interval getIntervaloDeTempo(int horaInicio, int horaFim, DateTime dia) {
 		return new Interval(new LocalDate(dia).toDateTime(new LocalTime(horaInicio, 0)),
 				new LocalDate(dia).toDateTime(new LocalTime(horaFim, 0)));
 	}

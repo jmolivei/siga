@@ -5,6 +5,7 @@ import java.util.Date;
 
 import br.gov.jfrj.siga.dp.CpOrgaoUsuario;
 import br.gov.jfrj.siga.dp.DpLotacao;
+import br.gov.jfrj.siga.dp.DpPessoa;
 
 
 public class SrAtendimento implements Comparable<SrAtendimento> {
@@ -12,21 +13,25 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	private SrSolicitacao solicitacao;
 	private Date dataInicio;
 	private Date dataFinal;
-	private SrValor tempoDecorrido;
+	private SrValor tempoAtendimento;
 	private SrFaixa faixa;
 	private DpLotacao lotacaoAtendente;
 	private DpLotacao lotacaoAtendenteDestino;
+	private DpPessoa pessoaAtendente;
 	private String tipoAtendimento;
-	private String classificacao;
+	private String itemConfiguracao;
+	private String acao;
 	
 	public SrAtendimento(SrSolicitacao solicitacao, Date dataInicio,
-			Date dataFinal, SrValor tempoDecorrido,
-			DpLotacao lotacaoAtendente, String tipoAtendimento) {
+			Date dataFinal, SrValor tempoAtendimento,
+			DpLotacao lotacaoAtendente, DpPessoa pessoaAtendente,
+			String tipoAtendimento) {
 		this.solicitacao = solicitacao;
 		this.dataInicio = dataInicio;
 		this.dataFinal = dataFinal;
-		this.tempoDecorrido = tempoDecorrido;
+		this.tempoAtendimento = tempoAtendimento;
 		this.lotacaoAtendente = lotacaoAtendente;
+		this.pessoaAtendente = pessoaAtendente;
 		this.tipoAtendimento = tipoAtendimento;
 	}
 	
@@ -46,8 +51,8 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		return dataFinal;
 	}
 
-	public SrValor getTempoDecorrido() {
-		return tempoDecorrido;
+	public SrValor getTempoAtendimento() {
+		return tempoAtendimento;
 	}
 
 	public SrFaixa getFaixa() {
@@ -57,6 +62,18 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	public DpLotacao getLotacaoAtendente() {
 		return lotacaoAtendente;
 	}	
+	
+	public DpPessoa getPessoaAtendente() {
+		return pessoaAtendente;
+	}
+	
+	public String getItemConfiguracao() {
+		return itemConfiguracao;
+	}
+
+	public void setItemConfiguracao(String itemConfiguracao) {
+		this.itemConfiguracao = itemConfiguracao;
+	}
 
 	public void setSolicitacao(SrSolicitacao solicitacao) {
 		this.solicitacao = solicitacao;
@@ -70,8 +87,8 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		this.dataFinal = dataFinal;
 	}
 
-	public void setTempoDecorrido(SrValor tempoDecorrido) {
-		this.tempoDecorrido = tempoDecorrido;
+	public void setTempoAtendimento(SrValor tempoAtendimento) {
+		this.tempoAtendimento = tempoAtendimento;
 	}
 
 	public void setFaixa(SrFaixa faixa) {
@@ -80,6 +97,10 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 
 	public void setLotacaoAtendente(DpLotacao lotacaoAtendente) {
 		this.lotacaoAtendente = lotacaoAtendente;
+	}
+	
+	public void setPessoaAtendente(DpPessoa pessoaAtendente) {
+		this.pessoaAtendente = pessoaAtendente;
 	}
 	
 	public DpLotacao getLotacaoAtendenteDestino() {
@@ -98,12 +119,12 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 		this.tipoAtendimento = tipoAtendimento;
 	}
 	
-	public String getClassificacao() {
-		return classificacao;
+	public String getAcao() {
+		return acao;
 	}
 
-	public void setClassificacao(String classificacao) {
-		this.classificacao = classificacao;
+	public void setAcao(String acao) {
+		this.acao = acao;
 	}
 
 	public String getDataInicioDDMMYYYYHHMMSS() {
@@ -138,11 +159,13 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	}
 	
 	public SrFaixa definirFaixaDeHoras(CpOrgaoUsuario orgao) {
-		float horas = tempoDecorrido.getValorEmHora();
-		if (orgao.getAcronimoOrgaoUsu().equals("JFRJ"))	
-			return definirFaixaJFRJ(horas);
-		else
-			return definirFaixaTRF(horas);
+		if (tempoAtendimento != null) {
+			if (orgao.getAcronimoOrgaoUsu().equals("JFRJ"))	
+				return definirFaixaJFRJ(tempoAtendimento.getValorEmHora());
+			else
+				return definirFaixaTRF(tempoAtendimento.getValorEmHora());
+		}
+		return null;
 	}
 	
 	private SrFaixa definirFaixaTRF(float horas) {
@@ -181,14 +204,14 @@ public class SrAtendimento implements Comparable<SrAtendimento> {
 	@Override
 	public int compareTo(SrAtendimento o) {
 		if (this != null && o != null) {
-			return this.getTempoDecorrido().compareTo(o.getTempoDecorrido());
-			/*if (this.getSolicitacao().codigo.equals(o.getSolicitacao().codigo))
-				if (this.getDataInicio().equals(o.getDataInicio()))
-					return this.getDataFinal().compareTo(o.getDataFinal());
-				else 
+			if (this.getTempoAtendimento() == null || o.getTempoAtendimento() == null || 
+					this.getTempoAtendimento().toString().equals(o.getTempoAtendimento().toString())) {
+				if (this.getSolicitacao().codigo.equals(o.getSolicitacao().codigo))
 					return this.getDataInicio().compareTo(o.getDataInicio());
-			else
-				return this.getSolicitacao().idSolicitacao.compareTo(o.getSolicitacao().idSolicitacao);*/
+				else
+					return this.getSolicitacao().codigo.compareTo(o.getSolicitacao().codigo);
+			} 
+			return this.getTempoAtendimento().compareTo(o.getTempoAtendimento());
 		}
 		return 0;
 	}

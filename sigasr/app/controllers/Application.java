@@ -3,6 +3,7 @@ package controllers;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,6 +56,7 @@ import play.data.validation.Error;
 import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.db.jpa.NoTransaction;
+import play.db.jpa.Transactional;
 import play.mvc.Before;
 import play.mvc.Catch;
 import play.mvc.Http;
@@ -1708,23 +1710,31 @@ public class Application extends SigaApplication {
 	}
 	
 	public static void exibirRelAtendimentos() throws Exception {
-		//assertAcesso("REL:Relatorio");
+		assertAcesso("REL:Relatorio");
 		render();
 	}
 	
-	@NoTransaction
-	public static void gerarRelAtendimentos(Long lotacao, String dtIni, String dtFim) throws Exception {
-		//assertAcesso("REL:Relatorio");
+	@Transactional(readOnly=true)
+	public static void gerarRelAtendimentos(Long lotacao, String dtIni, 
+			String dtFim, String downloadToken) throws Exception {
+		assertAcesso("REL:Relatorio");
 		DpLotacao lotaAtendente = JPA.em().find(DpLotacao.class, lotacao);
+		String nomeArquivoExportado = "relAtendimentos_" 
+					+  new SimpleDateFormat("ddMMyy_HHmm").format(new Date()) 
+					+ "_" + lotaAtendente.getSigla() + ".xlsx";
 		Map<String, Object> parametros = new HashMap<String, Object>();
 		parametros.put("dtIni", dtIni);
 		parametros.put("dtFim", dtFim);
 		parametros.put("idlotaAtendenteIni", lotaAtendente.getIdLotacaoIni());
-		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getAcronimoOrgaoUsu());
-		parametros.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+		parametros.put("secaoUsuario", lotaAtendente.getOrgaoUsuario().getDescricaoMaiusculas());
+		parametros.put(JRParameter.IS_IGNORE_PAGINATION, true);
 		
 		SrRelDadosBase rel = new SrRelDadosBase(parametros);
 		rel.gerar();
-		rel.getRelatorioExcel("C:\\Users\\fyk\\Documents\\exportar14.xls");	
+		byte[] arquivo = rel.getRelatorioExcel();
+		
+		response.setCookie("fileDownloadToken", downloadToken);
+		renderBinary(new ByteArrayInputStream(arquivo), nomeArquivoExportado,  
+				arquivo.length, false);
 	}
 }
