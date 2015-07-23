@@ -560,7 +560,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 
 	// Edson: Necessï¿½rio porque nao hï¿½ binder para arquivo
 	public void setArquivo(File file) {
-		this.arquivo = new SrArquivo(file);//SrArquivo.newInstance(file);
+		//this.arquivo = SrArquivo.newInstance(file);
+		if (file != null)
+			this.arquivo = new SrArquivo(file);
+		else
+			this.arquivo = null;
 	}
 
 	public int getGUT() {
@@ -2325,7 +2329,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 				.findById(SrTipoMovimentacao.TIPO_MOVIMENTACAO_FIM_PENDENCIA);
 		
 		// Edson: eh necessario setar a finalizadora na finalizada antes de 
-		// salvar() a finalizadora, pq se não, ao atualizarMarcas(), vai 
+		// salvar() a finalizadora, pq se nï¿½o, ao atualizarMarcas(), vai 
 		// parecer que a pendencia nao foi finalizada, atrapalhando calculos 
 		// de prazo
 		SrMovimentacao movFinalizada = SrMovimentacao.findById(idMovimentacao);

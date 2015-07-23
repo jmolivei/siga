@@ -265,7 +265,11 @@ public class SrMovimentacao extends GenericModel {
 	}
 
 	public void setArquivo(File file) {
-		this.arquivo = new SrArquivo(file); //SrArquivo.newInstance(file);
+		//this.arquivo = SrArquivo.newInstance(file);
+		if (file != null)
+			this.arquivo = new SrArquivo(file);
+		else
+			this.arquivo = null;
 	}
 	
 	public SrMovimentacao salvar(DpPessoa cadastrante, DpLotacao lotaCadastrante, 
@@ -288,14 +292,14 @@ public class SrMovimentacao extends GenericModel {
 		solicitacao.refresh();
 
 		solicitacao.atualizarMarcas();
-		//notificação usuário
+		//notificacao usuario
 		if (solicitacao.getMovimentacaoSetComCancelados().size() > 1
 				&& tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO
 				&& solicitacao.formaAcompanhamento != SrFormaAcompanhamento.ABERTURA
 				&& !(solicitacao.formaAcompanhamento == SrFormaAcompanhamento.ABERTURA_FECHAMENTO
 				&& tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_FECHAMENTO && tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_INICIO_POS_ATENDIMENTO))
 			notificar();
-		//notificação atendente
+		//notificacao atendente
 		notificarAtendente();
 		return this;
 	}
