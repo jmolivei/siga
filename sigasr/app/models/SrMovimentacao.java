@@ -57,51 +57,51 @@ public class SrMovimentacao extends GenericModel {
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date dtIniMov;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_ARQUIVO")
 	public SrArquivo arquivo;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_ATENDENTE")
 	public DpPessoa atendente;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_LOTA_ATENDENTE")
 	public DpLotacao lotaAtendente;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_DESIGNACAO")
 	public SrConfiguracao designacao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_CADASTRANTE")
 	public DpPessoa cadastrante;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_LOTA_CADASTRANTE")
 	public DpLotacao lotaCadastrante;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_TITULAR")
 	public DpPessoa titular;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_LOTA_TITULAR")
 	public DpLotacao lotaTitular;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_SOLICITACAO")
 	public SrSolicitacao solicitacao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_LISTA")
 	public SrLista lista;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "ID_MOV_CANCELADORA")
 	public SrMovimentacao movCanceladora;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "ID_TIPO_MOVIMENTACAO")
 	public SrTipoMovimentacao tipoMov;
 
@@ -129,19 +129,19 @@ public class SrMovimentacao extends GenericModel {
 	@Enumerated
 	public SrTipoMotivoPendencia motivoPendencia;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "ID_MOV_FINALIZADORA")
 	public SrMovimentacao movFinalizadora;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_SOLICITACAO_REFERENCIA")
 	public SrSolicitacao solicitacaoReferencia;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO")
 	public SrItemConfiguracao itemConfiguracao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_ACAO")
 	public SrAcao acao;
 	
@@ -265,11 +265,7 @@ public class SrMovimentacao extends GenericModel {
 	}
 
 	public void setArquivo(File file) {
-		//this.arquivo = SrArquivo.newInstance(file);
-		if (file != null)
-			this.arquivo = new SrArquivo(file);
-		else
-			this.arquivo = null;
+		this.arquivo = SrArquivo.newInstance(file);
 	}
 	
 	public SrMovimentacao salvar(DpPessoa cadastrante, DpLotacao lotaCadastrante, 
@@ -292,14 +288,14 @@ public class SrMovimentacao extends GenericModel {
 		solicitacao.refresh();
 
 		solicitacao.atualizarMarcas();
-		//notificacao usuario
+		//notifica��o usu�rio
 		if (solicitacao.getMovimentacaoSetComCancelados().size() > 1
 				&& tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO
 				&& solicitacao.formaAcompanhamento != SrFormaAcompanhamento.ABERTURA
 				&& !(solicitacao.formaAcompanhamento == SrFormaAcompanhamento.ABERTURA_FECHAMENTO
 				&& tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_FECHAMENTO && tipoMov.idTipoMov != SrTipoMovimentacao.TIPO_MOVIMENTACAO_INICIO_POS_ATENDIMENTO))
 			notificar();
-		//notificacao atendente
+		//notifica��o atendente
 		notificarAtendente();
 		return this;
 	}

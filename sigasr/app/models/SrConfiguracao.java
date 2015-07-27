@@ -62,11 +62,11 @@ public class SrConfiguracao extends CpConfiguracao {
 	@JoinTable(name="SR_CONFIGURACAO_ACAO", schema = "SIGASR", joinColumns={@JoinColumn(name="ID_CONFIGURACAO")}, inverseJoinColumns={@JoinColumn(name="ID_ACAO")})
 	public List<SrAcao> acoesSet;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_ATENDENTE")
 	public DpLotacao atendente;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_TIPO_ATRIBUTO")
 	public SrAtributo atributo;
 
@@ -74,7 +74,7 @@ public class SrConfiguracao extends CpConfiguracao {
 	@JoinColumn(name = "ID_PESQUISA")
 	public SrPesquisa pesquisaSatisfacao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "ID_LISTA")
 	public SrLista listaPrioridade;
 	
@@ -129,7 +129,7 @@ public class SrConfiguracao extends CpConfiguracao {
 	}
 
 	public String getAtributoObrigatorioString() {
-		return atributoObrigatorio ? "Sim" : "Não";
+		return atributoObrigatorio ? "Sim" : "Nï¿½o";
 	}
 
 	public void salvarComoDesignacao() throws Exception {

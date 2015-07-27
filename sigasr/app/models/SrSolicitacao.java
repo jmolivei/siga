@@ -112,35 +112,35 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Column(name = "ID_SOLICITACAO")
 	public Long idSolicitacao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITANTE")
 	public DpPessoa solicitante;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_INTERLOCUTOR")
 	public DpPessoa interlocutor;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_SOLICITANTE")
 	public DpLotacao lotaSolicitante;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_CADASTRANTE")
 	public DpPessoa cadastrante;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_CADASTRANTE")
 	public DpLotacao lotaCadastrante;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_TITULAR")
 	public DpPessoa titular;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_LOTA_TITULAR")
 	public DpLotacao lotaTitular;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_DESIGNACAO")
 	public SrConfiguracao designacao;
 
@@ -150,11 +150,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Transient
 	private Cronometro cron;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ORGAO_USU")
 	public CpOrgaoUsuario orgaoUsuario;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_SOLICITACAO_PAI")
 	public SrSolicitacao solicitacaoPai;
 
@@ -168,15 +168,15 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Enumerated
 	public SrMeioComunicacao meioComunicacao;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ITEM_CONFIGURACAO")
 	public SrItemConfiguracao itemConfiguracao;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(/*fetch = FetchType.LAZY,*/ cascade = CascadeType.ALL)
 	@JoinColumn(name = "ID_ARQUIVO")
 	public SrArquivo arquivo;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_ACAO")
 	public SrAcao acao;
 
@@ -208,7 +208,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Temporal(TemporalType.TIMESTAMP)
 	public Date dtOrigem;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ID_COMPLEXO")
 	public CpComplexo local;
 
@@ -230,7 +230,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 	@Column(name = "DESCR_CODIGO")
 	public String codigo;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "HIS_ID_INI", insertable = false, updatable = false)
 	public SrSolicitacao solicitacaoInicial;
 
@@ -560,11 +560,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 
 	// Edson: Necess�rio porque nao h� binder para arquivo
 	public void setArquivo(File file) {
-		//this.arquivo = SrArquivo.newInstance(file);
-		if (file != null)
+		this.arquivo = SrArquivo.newInstance(file);
+/*		if (file != null)
 			this.arquivo = new SrArquivo(file);
 		else
-			this.arquivo = null;
+			this.arquivo = null;*/
 	}
 
 	public int getGUT() {

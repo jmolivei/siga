@@ -160,6 +160,12 @@
 			<url>https://github.com/projeto-siga/siga-repo/tree/master/repo</url>
 		</repository>
 
+
+		<!-- repositorio adicionado para o dynamic jasper -->
+		<repository>
+	    	<id>fdvsolution.public</id>
+	    	<url>http://nexus.fdvs.com.ar/content/groups/public/</url>
+	    </repository>
 	</repositories>
 
 	<dependencyManagement>
