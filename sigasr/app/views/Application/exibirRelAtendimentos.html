@@ -1,0 +1,70 @@
+#{extends 'main.html' /}
+#{set 'moreHead'}
+	<script src="/sigasr/public/javascripts/jquery.cookie.js"></script>
+#{/set}
+<script type="text/javascript">
+		$(document).ready(function(){			
+			$.removeCookie('fileDownloadToken');
+		});
+		var fileDownloadCheckTimer;
+		var token;
+		function blockUIForDownload() {
+			token = new Date().getTime(); 
+			$('#downloadToken').val(token);
+			jQuery.blockUI({
+				css: {border: 'none', 
+				    padding: '15px', 
+				    backgroundColor: '#000', 
+				    '-webkit-border-radius': '10px', 
+				    '-moz-border-radius': '10px', 
+				    'border-radius' : '10px',
+				    opacity: .5, 
+				    color: '#fff'}, 
+				message: '<h2 style="color : #fff;"> Aguarde! Gerando relatório... </h2>' });
+			fileDownloadCheckTimer = setInterval(checkDownload, 1000);
+		}
+		function checkDownload() {
+			var cookieValue = $.cookie('fileDownloadToken');
+			if (cookieValue == token) {
+				finishDownload();
+			}
+		}
+		function finishDownload() {
+			clearInterval(fileDownloadCheckTimer);
+			$.removeCookie('fileDownloadToken'); 
+			jQuery.unblockUI();
+		}
+</script>
+	<div class="gt-bd clearfix">
+	<div class="gt-content clearfix">
+		<div class="gt-content-box gt-for-table" style="margin-top: 15px;">
+		*{#{if flash.success} <p class="gt-success">${flash.success}</p> #{/if}}*
+		#{form @Application.gerarRelAtendimentos(),
+			enctype:'multipart/form-data',id:'formRelAtendimento',onsubmit:'javascript:blockUIForDownload();' }		
+			<table class="gt-form-table">
+				<tbody>
+					<tr class="header">
+						<td align="center" valign="top" colspan="4">Dados do Relatório de Atendimentos</td>
+					</tr>
+					<tr>
+						<td>Lotação Atendente</td>
+						<td> #{selecao tipo:'lotacao',nome:'lotacao', value:lotacao /}</td>	
+					</tr>
+					<tr>
+						<td>Data inicial e final</td>
+						<td>
+							<input type="text" name="dtIni" value="" onblur="javascript:verifica_data(this,true)"  /> a
+							<input type="text" name="dtFim" value="" onblur="javascript:verifica_data(this,true)"  />
+						</td>
+					</tr>
+					<tr>
+							<input type="hidden" name="downloadToken" id="downloadToken" value="" />
+							<td colspan="2"><input type="submit"
+								class="gt-btn-medium gt-btn-left" value="Gerar"></td>
+					</tr>
+					</tbody>
+				</table>
+		#{/form}
+		</div>
+	</div>
+	</div>
