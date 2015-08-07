@@ -1,5 +1,10 @@
 package br.gov.jfrj.siga.sr.model;
 
+import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_ESCALONAMENTO;
+import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO;
+import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_REABERTURA;
+import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_FECHAMENTO;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -205,6 +210,17 @@ public class SrMovimentacao extends Objeto {
         return isCancelada() || getTipoMov().getIdTipoMov() == SrTipoMovimentacao.TIPO_MOVIMENTACAO_CANCELAMENTO_DE_MOVIMENTACAO;
     }
 
+    public boolean isInicioAtendimento(){
+    	return  getTipoMov().getIdTipoMov() == TIPO_MOVIMENTACAO_ESCALONAMENTO
+					|| getTipoMov().getIdTipoMov() == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO
+					|| getTipoMov().getIdTipoMov() == TIPO_MOVIMENTACAO_REABERTURA;
+    }
+    
+    public boolean isFimAtendimento(){
+    	return  getTipoMov().getIdTipoMov() == TIPO_MOVIMENTACAO_ESCALONAMENTO
+					|| getTipoMov().getIdTipoMov() == TIPO_MOVIMENTACAO_FECHAMENTO;
+    }
+    
     public SrMovimentacao getAnterior() {
         boolean pronto = false;
         for (SrMovimentacao mov : getSolicitacao().getMovimentacaoSet()) {

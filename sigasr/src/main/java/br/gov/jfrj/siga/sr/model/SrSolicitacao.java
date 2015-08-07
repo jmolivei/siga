@@ -15,6 +15,8 @@ import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_JUN
 import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_REABERTURA;
 import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_RETIRADA_DE_LISTA;
 import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_VINCULACAO;
+import static br.gov.jfrj.siga.sr.model.SrTipoMovimentacao.TIPO_MOVIMENTACAO_FIM_PENDENCIA;
+
 import static org.joda.time.format.DateTimeFormat.forPattern;
 
 import java.lang.reflect.InvocationTargetException;
@@ -713,10 +715,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
         return getMovimentacaoSet(false, null, true, false, false, false);
     }
 
-	public Set<SrMovimentacao> getMovimentacaoSetCalculoAtendimento(boolean todoOContexto) {
+	public Set<SrMovimentacao> getMovimentacaoSetDeInicioEFimAtendimento(boolean todoOContexto) {
+		//movimentacoes que marcam o inicio e fim de um atendimento
 		List<Long> tiposPrincipais = Arrays.asList(TIPO_MOVIMENTACAO_ESCALONAMENTO,
 				TIPO_MOVIMENTACAO_FECHAMENTO, TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO, 
-				TIPO_MOVIMENTACAO_REABERTURA);
+				TIPO_MOVIMENTACAO_REABERTURA);//, TIPO_MOVIMENTACAO_INICIO_PENDENCIA, TIPO_MOVIMENTACAO_FIM_PENDENCIA);
 		
 		return getMovimentacaoSet(false, null, false, todoOContexto, false, false, tiposPrincipais);	
 	}
@@ -1008,7 +1011,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
         }
         return true;
     }
-
+    
     public boolean sofreuMov(long idTpMov, long... idsTpsReversores) {
         return sofreuMov(new long[] { idTpMov }, idsTpsReversores);
     }
@@ -2610,269 +2613,6 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
         return getTempoDecorrido(getDtInicioAtendimento(), dtFechamento);
     }
 
-    public Set<SrAtendimento> getAtendimentos(boolean todoOContexto) {
-		Set<SrMovimentacao> listaMov = getMovimentacaoSetCalculoAtendimento(todoOContexto);
-		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
-		SrAtendimento atendimento = null;
-		
-		try {
-			if (!isFechado()) {
-				atendimento = new SrAtendimento();
-				atendimento.setDataFinal(new Date());
-				atendimento.setPessoaAtendente(getAtendente());
-				atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
-				atendimento.setAcao(this.acao.toString());
-			}
-			for (SrMovimentacao mov : listaMov) {	
-				//marca inicio de atendimento
-				if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_ESCALONAMENTO
-						|| mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO
-						|| mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_REABERTURA) {
-					atendimento.setDataInicio(mov.getDtIniMov());
-					atendimento.setTempoAtendimento(getTempoAtendimentoReal(atendimento.getDataInicio(),
-							atendimento.getDataFinal()));
-					atendimento.setLotacaoAtendente(mov.getLotaAtendente());
-					atendimento.setSolicitacao(this);
-					atendimento.setFaixa(atendimento.definirFaixaDeHoras(mov.getLotaAtendente().getOrgaoUsuario()));
-									
-					listaAtendimentos.add(atendimento);
-				}	
-				//marca fim de atendimento
-				if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_FECHAMENTO 
-						|| mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
-					atendimento = new SrAtendimento();
-					atendimento.setDataFinal(mov.getDtIniMov());
-					atendimento.setTipoAtendimento(mov.getTipoMov().getNome());
-					if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_ESCALONAMENTO) {
-						atendimento.setLotacaoAtendenteDestino(mov.getLotaAtendente());
-						atendimento.setPessoaAtendente(mov.getTitular());
-						atendimento.setItemConfiguracao(mov.getItemConfiguracao().toString());
-						atendimento.setAcao(mov.getAcao().toString());
-					}
-					else {
-						atendimento.setPessoaAtendente(mov.getAtendente());
-						atendimento.setItemConfiguracao(getItemAtual().toString());
-						atendimento.setAcao(getAcaoAtual().toString());
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return listaAtendimentos;
-	}
-	
-	public Set<SrAtendimento> getAtendimentosSolicitacaoPai() {
-		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
-		Set<SrMovimentacao> listaMov = getMovimentacaoSetCalculoAtendimento(true);
-		SrSolicitacao ultimaFilha = getUltimaSolFilhaFechadaOuCancelada();
-		DpLotacao lotacaoAtendente = getLotaAtendente();
-		DpPessoa pessoaAtendente = getAtendente();
-		SrAtendimento atendimento = null;
-		Date dataFinalPai, dataFinalFilha = null; 
-		Date dtFinal = null; Date dtInicio = null;
-		DpLotacao lotacaoDestino = null;
-		String classificacao = null;
-		
-		try {
-			if (ultimaFilha != null)		
-				dataFinalFilha = ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento()
-						: ultimaFilha.getDtEfetivoFechamento();
-			if ((isAFechar() || isFechado())) {
-				if (isFechado()) {
-					dataFinalPai = getDtEfetivoFechamento();
-					classificacao = "Fechamento";
-				}
-				else {
-					dataFinalPai = new Date();	
-					classificacao = "A Fechar";
-				}
-				atendimento = new SrAtendimento(this, dataFinalFilha, dataFinalPai, 
-						getTempoAtendimentoReal(dataFinalFilha, dataFinalPai), lotacaoAtendente, 
-						pessoaAtendente, classificacao);
-				atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
-				atendimento.setLotacaoAtendenteDestino(null);
-				atendimento.setItemConfiguracao(getItemAtual().toString());
-				atendimento.setAcao(getAcaoAtual().toString());
-				listaAtendimentos.add(atendimento);
-			}
-			//incluir a REABERTURA
-			// tornar isso um metodo Usar o getMovimentacaoSetPorTipo(), alterar para ele aceitar todo o contexto
-			for (SrMovimentacao mov : listaMov) {
-				if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO) {
-					if (dataFinalFilha != null && mov.getDtIniMov().compareTo(dataFinalFilha) == 1) {
-						atendimento = new SrAtendimento(this, dataFinalFilha, mov.getDtIniMov(),
-								getTempoAtendimentoReal(dataFinalFilha, mov.getDtIniMov()), lotacaoAtendente,
-								mov.getTitular(), "Escalonamento com sol. filha");
-						atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
-						atendimento.setLotacaoAtendenteDestino(mov.getLotaAtendente());
-						atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
-						atendimento.setAcao(this.acao.toString());
-						listaAtendimentos.add(atendimento);
-					}
-					else { 
-						if (mov.getSolicitacao().isFilha()) {
-							dtFinal = mov.getSolicitacao().getDtInicioAtendimento();
-							lotacaoDestino = mov.getLotaAtendente();
-							pessoaAtendente = mov.getTitular();
-						}
-						if (mov.getSolicitacao().equals(this)) {
-							dtInicio = getDtInicioAtendimento();
-							atendimento = new SrAtendimento(this, dtInicio, dtFinal, 
-									getTempoAtendimentoReal(dtInicio, dtFinal), lotacaoAtendente,
-									pessoaAtendente, "Escalonamento com sol. filha");
-							atendimento.setFaixa(atendimento.definirFaixaDeHoras(lotacaoAtendente.getOrgaoUsuario()));
-							atendimento.setLotacaoAtendenteDestino(lotacaoDestino);
-							atendimento.setItemConfiguracao(this.itemConfiguracao.toString());
-							atendimento.setAcao(this.acao.toString());
-							listaAtendimentos.add(atendimento);
-						}
-					}
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return listaAtendimentos;
-	}
-	
-	// nao foi possivel usar os metodos after e before para comparar as datas, pois
-	// para datas em que a diferenca sao poucos milisegundos a resposta eh errada
-	public List<Interval> getTrechosSemPendencia(Date dtIni, Date dtFim) {
-		Map<Date, Date> pendencias = getTrechosPendentes();
-		List<Interval> listaDeIntervalos = new ArrayList<Interval>();
-		Interval intervaloSemPendencia = null;
-		for (Date dtIniBlocoPendencia : pendencias.keySet()) {
-			Date dtFimBlocoPendencia = pendencias.get(dtIniBlocoPendencia);
-			// ----------I----------F---PPPP---
-			if (dtIniBlocoPendencia.getTime() > (dtFim.getTime()))
-				break;	
-			// -------PPPIPPPPPPPPPPPPFP------- ou 
-			// -------PPPIPPPPPPPPPPFPPP...---- 
-			if ((dtFimBlocoPendencia == null || dtFimBlocoPendencia.getTime() > (dtFim.getTime()))
-					&& dtIniBlocoPendencia.getTime() < (dtIni.getTime()))
-				return listaDeIntervalos;
-			// ---PPPP---I----------F----------
-			if (dtFimBlocoPendencia != null && dtFimBlocoPendencia.getTime() < (dtIni.getTime()))
-				continue;
-			// ----------I---PPPP---F----------
-			if (dtIniBlocoPendencia.getTime() > (dtIni.getTime())) {
-
-				intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtIniBlocoPendencia));
-				listaDeIntervalos.add(intervaloSemPendencia);
-			}
-			dtIni = dtFimBlocoPendencia;
-		}
-		if (dtIni != null && !(dtIni.getTime() > dtFim.getTime())) {
-			intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtFim));
-			listaDeIntervalos.add(intervaloSemPendencia);
-		}
-		return listaDeIntervalos;
-	}
-	
-	public SrValor getTempoAtendimentoReal(Date dataInicio, Date dataFinal) {
-		List<Interval> listaTrechosDeAtendimentos = getTrechosSemPendencia(dataInicio, dataFinal);
-		Interval intervaloDeTrabalho = null;
-		SrValor tempoAtendimentoLiquido = null;
-		Long tempoAtendimentoParcial = 0L;
-		Long tempoAtendimentoBruto, tempoADescontarTotal = 0L;
-		
-		
-		if (listaTrechosDeAtendimentos.size() > 0) {
-			for (Interval intervaloAtendimento : listaTrechosDeAtendimentos) {
-				intervaloDeTrabalho = getIntervaloDeTempo(8, 20, intervaloAtendimento.getStart());
-				if (intervaloDeTrabalho.contains(intervaloAtendimento) 
-						|| (!intervaloAtendimento.getStart().isBefore(intervaloDeTrabalho.getStart())
-								&& intervaloAtendimento.getStart().toLocalDate().equals(intervaloAtendimento.getEnd().toLocalDate()))) {
-					tempoAtendimentoParcial += Seconds.secondsBetween(intervaloAtendimento.getStart(), 
-							intervaloAtendimento.getEnd()).getSeconds(); 
-				}
-				else
-					tempoADescontarTotal += getTempoSemEfetivoAtendimento(intervaloAtendimento, intervaloDeTrabalho);
-			}
-			// quando alterar o metodo getTempoSemEfetivoAtendimento para getTempoEfetivoAtendimento
-			// essa condicao nao sera mais necessaria
-			if (tempoADescontarTotal > 0)
-				tempoAtendimentoBruto = (long) Seconds.secondsBetween(new DateTime(dataInicio), new DateTime(dataFinal))
-													.getSeconds(); 
-			else
-				tempoAtendimentoBruto = tempoAtendimentoParcial;
-			tempoAtendimentoLiquido = new SrValor(tempoAtendimentoBruto - tempoADescontarTotal, 
-					CpUnidadeMedida.SEGUNDO);
-			return tempoAtendimentoLiquido;
-		}
-		return tempoAtendimentoLiquido;	
-	}
-	
-	public Long getTempoSemEfetivoAtendimento(Interval intervaloAtendimento, Interval intervaloDeTrabalho) {	
-		DateTime inicio = intervaloAtendimento.getStart();
-		DateTime fim = intervaloAtendimento.getEnd();
-		Seconds tempoExtra = null; Seconds tempoExtraParcial = null;
-		Long tempoADescontar = null;
-		int diasNaoUteis = 0; 
-		
-		try {
-			if (inicio.isAfter(fim))
-				System.out.println(("SOLICITACAO: " + this.codigo + ", id: " + this.idSolicitacao));
-			//tratando o "inicio do atendimento"
-			if (isDiaUtil(inicio)) {
-				if (inicio.isAfter(intervaloDeTrabalho.getEnd()))
-					tempoExtra = Seconds.secondsBetween(inicio, 
-							new LocalDate(inicio).toDateTime(new LocalTime(23, 59, 59)));
-				else {
-					if (inicio.isBefore(intervaloDeTrabalho.getStart()))
-						tempoExtra = Seconds.secondsBetween(inicio, intervaloDeTrabalho.getStart());
-					if (!inicio.toLocalDate().equals(fim.toLocalDate()))
-						tempoExtra = Seconds.secondsBetween(intervaloDeTrabalho.getEnd(), 
-								new LocalDate(inicio).toDateTime(new LocalTime(23, 59, 59)));
-				}
-			}
-			//descontando o horario antes do inicio oficial de trabalho ao "final do atendimento"
-			if (!inicio.toLocalDate().equals(fim.toLocalDate())) {
-				intervaloDeTrabalho = getIntervaloDeTempo(8, 20, fim);
-				tempoExtra = (Seconds.secondsBetween(new LocalDate(fim).toDateTime(LocalTime.MIDNIGHT),
-						intervaloDeTrabalho.getStart()).plus(tempoExtra));
-				//tratando so dias entre o primeiro e o ultimo dias
-				DateTime diaDepoisInicio = inicio.plusDays(1);
-				while (diaDepoisInicio.toLocalDate().isBefore(fim.toLocalDate())) {
-					//dia nao util
-					if (!isDiaUtil(diaDepoisInicio))
-						diasNaoUteis++;
-					else
-						tempoExtraParcial = (Days.ONE.toStandardSeconds()
-							.minus(Seconds.secondsIn(getIntervaloDeTempo(8, 20, diaDepoisInicio)))
-							.plus(tempoExtraParcial)); 					
-					diaDepoisInicio = diaDepoisInicio.plusDays(1);
-				}
-			}
-			if (tempoExtra != null) {
-				if (tempoExtraParcial != null)
-					tempoExtra = tempoExtra.plus(tempoExtraParcial);
-			} 
-			else
-				tempoExtra = Seconds.ZERO;	
-			
-			tempoADescontar = (diasNaoUteis * (long) Days.ONE.toStandardSeconds().getSeconds()) 
-					+ tempoExtra.getSeconds();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return tempoADescontar;
-	}
-	
-	public boolean isDiaUtil(DateTime data) {
-		return (data.getDayOfWeek() != DateTimeConstants.SATURDAY 
-				&& data.getDayOfWeek() != DateTimeConstants.SUNDAY);
-	}
-	
-	public Interval getIntervaloDeTempo(int horaInicio, int horaFim, DateTime dia) {
-		return new Interval(new LocalDate(dia).toDateTime(new LocalTime(horaInicio, 0)),
-				new LocalDate(dia).toDateTime(new LocalTime(horaFim, 0)));
-	}
-    
     // Edson: implementar no futuro
     public Long getResultadoPesquisaSatisfacao() {
         return 0L;
@@ -3014,7 +2754,213 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
         int size = historicoAcao.size();
         return historicoAcao.get(size - 1);
     }
+    
+    public Set<SrAtendimento> getAtendimentosSet() {
+		Set<SrMovimentacao> listaMov = getMovimentacaoSetDeInicioEFimAtendimento(false);
+		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
+		SrAtendimento atendimento = null;
+		try {
+			if (!isFechado()) 
+				atendimento = new SrAtendimento(this, new Date(), getAtendente(), 
+						this.itemConfiguracao.toString(), this.acao.toString(), null, null);
 
+			for (SrMovimentacao mov : listaMov) {	
+				//marca inicio de atendimento
+				if (mov.isInicioAtendimento()) {
+					atendimento.setDataInicio(mov.getDtIniMov());
+					atendimento.setTempoAtendimento(getTempoEfetivoAtendimento(atendimento.getDataInicio(),
+							atendimento.getDataFinal()));
+					atendimento.setLotacaoAtendente(mov.getLotaAtendente());
+					atendimento.definirFaixa(mov.getLotaAtendente().getOrgaoUsuario());
+									
+					listaAtendimentos.add(atendimento);
+				}	
+				//marca fim de atendimento
+				if (mov.isFimAtendimento()) {
+					if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_ESCALONAMENTO)
+						atendimento = new SrAtendimento(this, mov.getDtIniMov(), mov.getTitular(), 
+								mov.getItemConfiguracao().toString(), mov.getAcao().toString(),
+								mov.getTipoMov().getNome(), mov.getLotaAtendente());
+					else 
+						atendimento = new SrAtendimento(this, mov.getDtIniMov(), mov.getAtendente(), 
+								getItemAtual().toString(), getAcaoAtual().toString(), 
+								mov.getTipoMov().getNome(), null);	
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return listaAtendimentos;
+	}
+	
+	public Set<SrAtendimento> getAtendimentosSetSolicitacaoPai() {
+		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
+		Set<SrMovimentacao> listaMov = getMovimentacaoSetDeInicioEFimAtendimento(true);
+		SrSolicitacao ultimaFilha = getUltimaSolFilhaFechadaOuCancelada();
+		DpLotacao lotacaoAtendente = getLotaAtendente();
+		DpPessoa pessoaAtendente = null;
+		SrAtendimento atendimento = null;
+		Date dataFinalFilha = null; 
+		Date dtFinal = null; Date dtInicio = null;
+		DpLotacao lotacaoDestino = null;
+		
+		try {
+			if (ultimaFilha != null)		
+				dataFinalFilha = ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento()
+						: ultimaFilha.getDtEfetivoFechamento();
+
+			listaAtendimentos.add(getUltimoAtendimentoSolPai(dataFinalFilha));
+			for (SrMovimentacao mov : listaMov) {
+				if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO) {
+					if (dataFinalFilha != null && mov.getDtIniMov().compareTo(dataFinalFilha) == 1) {
+						atendimento = new SrAtendimento(this, dataFinalFilha,  mov.getDtIniMov(), 
+							getTempoEfetivoAtendimento(dataFinalFilha, mov.getDtIniMov()), lotacaoAtendente, 
+							mov.getLotaAtendente(), mov.getTitular(), "Escalonamento com sol. filha", 
+							this.itemConfiguracao.toString(), this.acao.toString());					
+						atendimento.definirFaixa(lotacaoAtendente.getOrgaoUsuario());
+						listaAtendimentos.add(atendimento);
+					}
+					else { 
+						if (mov.getSolicitacao().isFilha()) {
+							dtFinal = mov.getSolicitacao().getDtInicioAtendimento();
+							lotacaoDestino = mov.getLotaAtendente();
+							pessoaAtendente = mov.getTitular();
+						}
+						if (mov.getSolicitacao().equals(this)) {
+							dtInicio = getDtInicioAtendimento();
+							atendimento = new SrAtendimento(this, dtInicio,  dtFinal, 
+								getTempoEfetivoAtendimento(dtInicio, dtFinal), lotacaoAtendente, 
+								lotacaoDestino, pessoaAtendente, "Escalonamento com sol. filha", 
+								this.itemConfiguracao.toString(), this.acao.toString());		
+							atendimento.definirFaixa(lotacaoAtendente.getOrgaoUsuario());
+							listaAtendimentos.add(atendimento);
+						}
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return listaAtendimentos;
+	}
+	
+	public SrAtendimento getUltimoAtendimentoSolPai(Date dataFinalUltimaFilha) {
+		SrAtendimento atendimento = null;
+		String tipoAtendimento = null;
+		Date dataFinalPai = null ; 
+		DpLotacao lotacaoAtendente = getLotaAtendente();
+		if (isFechado()) {
+			dataFinalPai = getDtEfetivoFechamento();
+			tipoAtendimento = "Fechamento";
+		}
+		else if(isAFechar()){
+			dataFinalPai = new Date();	
+			tipoAtendimento = "A Fechar";
+		}
+		atendimento = new SrAtendimento(this, dataFinalUltimaFilha, dataFinalPai, 
+				getTempoEfetivoAtendimento(dataFinalUltimaFilha, dataFinalPai), lotacaoAtendente, null, getAtendente(), 
+				tipoAtendimento, getItemAtual().toString(), getAcaoAtual().toString());
+		atendimento.definirFaixa(lotacaoAtendente.getOrgaoUsuario());
+		return atendimento;
+	}
+	
+	// nao foi possivel usar os metodos after e before para comparar as datas, pois
+	// para datas em que a diferenca sao poucos milisegundos a resposta eh errada
+	public List<Interval> getTrechosSemPendencia(Date dtIni, Date dtFim) {
+		Map<Date, Date> pendencias = getTrechosPendentes();
+		List<Interval> listaDeIntervalos = new ArrayList<Interval>();
+		Interval intervaloSemPendencia = null;
+		
+		for (Date dtIniBlocoPendencia : pendencias.keySet()) {
+			Date dtFimBlocoPendencia = pendencias.get(dtIniBlocoPendencia);
+			// ----------I----------F---PPPP---
+			if (dtIniBlocoPendencia.getTime() > (dtFim.getTime()))
+				break;	
+			
+			// -------PPPIPPPPPPPPPPPPFP------- ou 
+			// -------PPPIPPPPPPPPPPFPPP...---- 
+			if ((dtFimBlocoPendencia == null || dtFimBlocoPendencia.getTime() > (dtFim.getTime()))
+					&& dtIniBlocoPendencia.getTime() < (dtIni.getTime()))
+				return listaDeIntervalos;
+			
+			// ---PPPP---I----------F----------
+			if (dtFimBlocoPendencia != null && dtFimBlocoPendencia.getTime() < (dtIni.getTime()))
+				continue;
+			
+			// ----------I---PPPP---F----------
+			if (dtIniBlocoPendencia.getTime() > (dtIni.getTime())) {
+				intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtIniBlocoPendencia));
+				listaDeIntervalos.add(intervaloSemPendencia);
+			}
+			dtIni = dtFimBlocoPendencia;
+		}
+		if (dtIni != null && !(dtIni.getTime() > dtFim.getTime())) {
+			intervaloSemPendencia = new Interval(new DateTime(dtIni), new DateTime(dtFim));
+			listaDeIntervalos.add(intervaloSemPendencia);
+		}
+		return listaDeIntervalos;
+	}
+	
+	public SrValor getTempoEfetivoAtendimento(Date dataInicio, Date dataFinal) {
+		List<Interval> listaTrechosDeAtendimentos = getTrechosSemPendencia(dataInicio, dataFinal);
+		SrValor tempoAtendimentoLiquido = null;
+		Long tempoAtendimentoParcial = 0L;
+		
+		if (listaTrechosDeAtendimentos.size() > 0) {
+			for (Interval intervaloAtendimento : listaTrechosDeAtendimentos) {
+				tempoAtendimentoParcial += getTempoAtendimento(intervaloAtendimento);
+			}
+			tempoAtendimentoLiquido = new SrValor(tempoAtendimentoParcial, CpUnidadeMedida.SEGUNDO);
+		}
+		return tempoAtendimentoLiquido;	
+	}
+	
+	public Long getTempoAtendimento(Interval intervaloAtendimento) {	
+		DateTime inicio = intervaloAtendimento.getStart();
+		DateTime fim = intervaloAtendimento.getEnd();
+		Interval intervaloDeTrabalho = Util.getIntervaloDeTempo(8, 20, intervaloAtendimento.getStart());
+		Long tempoAtendimento = 0L;
+		
+		try {
+			if (Util.isMesmoDia(intervaloAtendimento.getStart(), intervaloAtendimento.getEnd())) {
+				if(!intervaloAtendimento.getStart().isBefore(intervaloDeTrabalho.getStart())) 
+					tempoAtendimento = intervaloAtendimento.toDuration().getStandardSeconds();
+				else
+					tempoAtendimento = (long) Seconds.secondsBetween(intervaloDeTrabalho.getStart(), 
+							intervaloAtendimento.getEnd()).getSeconds();
+			}
+			else {
+				//tratando o "inicio do atendimento"
+				if (Util.isDiaUtil(inicio)) {
+					if (intervaloDeTrabalho.contains(inicio)) 
+						tempoAtendimento = (long) Seconds.secondsBetween(inicio, intervaloDeTrabalho.getEnd())
+													.getSeconds();
+					else if (inicio.isBefore(intervaloDeTrabalho.getStart()))
+						tempoAtendimento = intervaloDeTrabalho.toDuration().getStandardSeconds();
+				}
+				//tratando o "final do atendimento"
+				intervaloDeTrabalho = Util.getIntervaloDeTempo(8, 20, fim);
+				if (fim.isAfter(intervaloDeTrabalho.getStart()))
+					tempoAtendimento += Seconds.secondsBetween(intervaloDeTrabalho.getStart(), fim)
+												.getSeconds();		
+				//tratando so os dias entre o inicio e fim de atendimento
+				DateTime diaDepoisInicio = inicio.plusDays(1);
+				while (diaDepoisInicio.toLocalDate().isBefore(fim.toLocalDate())) {
+					if (Util.isDiaUtil(diaDepoisInicio))
+						tempoAtendimento += Util.getIntervaloDeTempo(8, 20, diaDepoisInicio).toDuration()
+													.getStandardSeconds();
+					diaDepoisInicio = diaDepoisInicio.plusDays(1);
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tempoAtendimento;
+	}
+	   
     public Long getIdSolicitacao() {
         return idSolicitacao;
     }

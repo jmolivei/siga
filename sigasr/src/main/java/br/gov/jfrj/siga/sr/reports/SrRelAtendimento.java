@@ -89,9 +89,9 @@ public class SrRelAtendimento extends RelatorioTemplate {
 			List<SrSolicitacao> lista = query.getResultList();
 			for (SrSolicitacao sol : lista) {
 				if (sol.isPai())
-					listaAtendimento = sol.getAtendimentosSolicitacaoPai();
+					listaAtendimento = sol.getAtendimentosSetSolicitacaoPai();
 				else 
-					listaAtendimento = sol.getAtendimentos(false);	
+					listaAtendimento = sol.getAtendimentosSet();	
 				for (SrAtendimento a : listaAtendimento) {
 					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni) &&
 							a.getTempoAtendimento() != null) {
