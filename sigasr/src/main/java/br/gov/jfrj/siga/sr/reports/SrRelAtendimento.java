@@ -49,7 +49,7 @@ public class SrRelAtendimento extends RelatorioTemplate {
 		this.addColuna("Pessoa Atendente", 18, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Data de Inicio Atendimento", 20, RelatorioRapido.CENTRO, false);
 		this.addColuna("Data de Fim Atendimento", 20, RelatorioRapido.CENTRO, false);
-		this.addColuna("Tipo de Atendimento", 25, RelatorioRapido.ESQUERDA, false);
+		this.addColuna("Tipo de Atendimento", 28, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Proximo Atendente", 15, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Item Configuracao", 50, RelatorioRapido.ESQUERDA, false);
 		this.addColuna("Acao", 50, RelatorioRapido.ESQUERDA, false);
@@ -94,7 +94,7 @@ public class SrRelAtendimento extends RelatorioTemplate {
 					listaAtendimento = sol.getAtendimentosSet();	
 				for (SrAtendimento a : listaAtendimento) {
 					if (a.getLotacaoAtendente().getIdInicial().equals(idlotaAtendenteIni) &&
-							a.getTempoAtendimento() != null) {
+						a.getTempoAtendimento() != null) {
 						listaAtendimentoTotal.add(a);
 					}
 				}

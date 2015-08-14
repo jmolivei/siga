@@ -917,12 +917,10 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
         return listaCompleta;
     }
     
-	public SrSolicitacao  getUltimaSolFilhaFechadaOuCancelada() {
+	public SrSolicitacao  getUltimaSolicitacaoFilhaNaoAtiva() {
 		for (SrMovimentacao mov: getMovimentacaoSetComCanceladosTodoOContexto()) {
-			if (mov.getSolicitacao().isFilha() 
-					&& (mov.getSolicitacao().getDtEfetivoFechamento() !=  null
-						|| mov.getSolicitacao().getDtCancelamento() != null))
-			return mov.getSolicitacao();
+			if (mov.getSolicitacao().isFilha() && !mov.getSolicitacao().isAtivo())
+				return mov.getSolicitacao();
 		}
 		return null;
 	}
@@ -2765,7 +2763,6 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 						this.itemConfiguracao.toString(), this.acao.toString(), null, null);
 
 			for (SrMovimentacao mov : listaMov) {	
-				//marca inicio de atendimento
 				if (mov.isInicioAtendimento()) {
 					atendimento.setDataInicio(mov.getDtIniMov());
 					atendimento.setTempoAtendimento(getTempoEfetivoAtendimento(atendimento.getDataInicio(),
@@ -2775,7 +2772,6 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 									
 					listaAtendimentos.add(atendimento);
 				}	
-				//marca fim de atendimento
 				if (mov.isFimAtendimento()) {
 					if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_ESCALONAMENTO)
 						atendimento = new SrAtendimento(this, mov.getDtIniMov(), mov.getTitular(), 
@@ -2794,10 +2790,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		return listaAtendimentos;
 	}
 	
+    //refatorar esse metodo para se adequar a nova forma (introducao de pendencia na sol. pai)
 	public Set<SrAtendimento> getAtendimentosSetSolicitacaoPai() {
 		Set<SrAtendimento> listaAtendimentos = new TreeSet<SrAtendimento>();
 		Set<SrMovimentacao> listaMov = getMovimentacaoSetDeInicioEFimAtendimento(true);
-		SrSolicitacao ultimaFilha = getUltimaSolFilhaFechadaOuCancelada();
+		SrSolicitacao ultimaFilha = getUltimaSolicitacaoFilhaNaoAtiva();
 		DpLotacao lotacaoAtendente = getLotaAtendente();
 		DpPessoa pessoaAtendente = null;
 		SrAtendimento atendimento = null;
@@ -2806,11 +2803,11 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		DpLotacao lotacaoDestino = null;
 		
 		try {
-			if (ultimaFilha != null)		
+			if (ultimaFilha != null) {		
 				dataFinalFilha = ultimaFilha.isCancelado() ? ultimaFilha.getDtCancelamento()
 						: ultimaFilha.getDtEfetivoFechamento();
-
-			listaAtendimentos.add(getUltimoAtendimentoSolPai(dataFinalFilha));
+				listaAtendimentos.add(getFimAtendimentoSolicitacaoPai(dataFinalFilha));
+			}
 			for (SrMovimentacao mov : listaMov) {
 				if (mov.getTipoMov().getId() == TIPO_MOVIMENTACAO_INICIO_ATENDIMENTO) {
 					if (dataFinalFilha != null && mov.getDtIniMov().compareTo(dataFinalFilha) == 1) {
@@ -2846,7 +2843,7 @@ public class SrSolicitacao extends HistoricoSuporte implements SrSelecionavel {
 		return listaAtendimentos;
 	}
 	
-	public SrAtendimento getUltimoAtendimentoSolPai(Date dataFinalUltimaFilha) {
+	public SrAtendimento getFimAtendimentoSolicitacaoPai(Date dataFinalUltimaFilha) {
 		SrAtendimento atendimento = null;
 		String tipoAtendimento = null;
 		Date dataFinalPai = null ; 
