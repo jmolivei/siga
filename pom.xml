@@ -226,10 +226,10 @@
 						<groupId>commons-digester</groupId>
 						<artifactId>commons-digester</artifactId>
 					</exclusion> -->
-					<exclusion>
+<!-- 					<exclusion>
 						<groupId>com.lowagie</groupId>
 						<artifactId>itext</artifactId>
-					</exclusion>
+					</exclusion> -->
 					<!-- <exclusion>
 						<groupId>jfree</groupId>
 						<artifactId>jcommon</artifactId>
