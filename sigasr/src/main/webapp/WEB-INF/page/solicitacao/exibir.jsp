@@ -235,7 +235,7 @@
 			</div>
 		</div>
 
-		<jsp:include page="exibirCronometro.jsp"></jsp:include>
+		<jsp:include page="exibirAcordos.jsp"></jsp:include>
 		<jsp:include page="exibirPendencias.jsp"></jsp:include>
 		<div class="gt-sidebar">
 			<div class="gt-sidebar-content">
@@ -256,7 +256,7 @@
 					<p>
 						<b>Contato Inicial:</b> ${solicitacao.dtOrigemString}
 						<c:if test="${solicitacao.meioComunicacao != null}">
-                        , por ${solicitacao.meioComunicacao.descrMeioComunicacao}
+                        por ${solicitacao.meioComunicacao.descrMeioComunicacao}
                     </c:if>
 					</p>
 				</c:if>
@@ -405,11 +405,7 @@
 	            </div>
 	        </div>
 	    </c:if>
-    
-	    <c:if test="${solicitacao.estaCom(titular, lotaTitular) || exibirMenuAdministrar}">
-	        <jsp:include page="exibirAcordos.jsp"></jsp:include>
-	    </c:if>
-	    
+  
 	    <div id="divConhecimentosRelacionados">
 	        <jsp:include page="exibirConhecimentosRelacionados.jsp"></jsp:include>
 	    </div>
