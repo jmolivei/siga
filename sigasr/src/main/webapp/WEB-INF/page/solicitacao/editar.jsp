@@ -653,7 +653,7 @@
 			</div>
 		</div>
 		
- 		<jsp:include page="exibirCronometro.jsp"/>
+ 		<jsp:include page="exibirAcordos.jsp"/>
 		<jsp:include page="exibirPendencias.jsp"/>
 		
 		<%--
