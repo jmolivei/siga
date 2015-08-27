@@ -34,6 +34,7 @@
 	<jsp:include page="../main.jsp"></jsp:include>
 	
 	<script src="/sigasr/javascripts/jquery.maskedinput.min.js"></script>
+	<script src="/sigasr/javascripts/cronometro.js"></script>
 	
 	<style>
 	.barra-subtitulo {
@@ -653,7 +654,7 @@
 			</div>
 		</div>
 		
- 		<jsp:include page="exibirAcordos.jsp"/>
+ 		<jsp:include page="exibirCronometro.jsp"/>
 		<jsp:include page="exibirPendencias.jsp"/>
 		
 		<%--
