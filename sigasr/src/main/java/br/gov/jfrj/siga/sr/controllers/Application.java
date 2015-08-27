@@ -169,7 +169,7 @@ public class Application extends SrController {
             solicitacao.setDtOrigem(new Date());
         if (solicitacao.getDtIniEdicao() == null)
             solicitacao.setDtIniEdicao(new Date());
-        solicitacao.atualizarAcordos();
+        solicitacao.atualizarAcordos(null);
 
         formEditar(solicitacao.deduzirLocalRamalEMeioContato());
     }
