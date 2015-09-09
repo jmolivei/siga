@@ -1,4 +1,4 @@
-#{extends 'main.html' /} #{set title:'EdiÃ§Ã£o de atributo' /}
+#{extends 'main.html' /} #{set title:'Edição de acordo' /}
 
 <script src="/sigasr/public/javascripts/detalhe-tabela.js"></script>
 <script src="/sigasr/public/javascripts/jquery.validate.min.js"></script>
@@ -116,7 +116,7 @@
 				<div class="gt-form-row">
 					<label>Par&acirc;metro</label> #{select name:'parametro',
 					id:'parametro'} #{list items:parametros, as:'parametro'} #{option
-					parametro.idAtributo} ${parametro.nomeAtributo} #{/option} #{/list}
+					parametro.id} ${parametro.descricao} #{/option} #{/list}
 					#{/select}
 				</div>
 				<div class="gt-form-row">
@@ -678,13 +678,13 @@
 		$("#parametrosAcordo").find("li").each(function(i) {
 			var jDivs=$(this).find("span");
 
-			params += '&acordo.atributoAcordoSet[' + i + '].valor=' + jDivs[2].innerHTML;
-		    params += '&acordo.atributoAcordoSet[' + i + '].atributo.idAtributo=' + jDivs[0].id;
-		    params += '&acordo.atributoAcordoSet[' + i + '].unidadeMedida=' + jDivs[3].id;
-		    params += '&acordo.atributoAcordoSet[' + i + '].operador=' + jDivs[1].id;
+			params += '&acordo.parametroAcordoSet[' + i + '].valor=' + jDivs[2].innerHTML;
+		    params += '&acordo.parametroAcordoSet[' + i + '].parametro.id=' + jDivs[0].id;
+		    params += '&acordo.parametroAcordoSet[' + i + '].unidadeMedida=' + jDivs[3].id;
+		    params += '&acordo.parametroAcordoSet[' + i + '].operador=' + jDivs[1].id;
 
 		    if (this.id.indexOf("novo_") < 1)
-		    	params += '&acordo.atributoAcordoSet[' + i + '].idAtributoAcordo=' + this.id;
+		    	params += '&acordo.parametroAcordoSet[' + i + '].idParametroAcordo=' + this.id;
 		});
 		
 		return params;
